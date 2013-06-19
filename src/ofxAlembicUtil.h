@@ -9,8 +9,9 @@
 
 namespace ofxAlembic
 {
-	void init();
+	struct Point;
 	
+	void init();
 	void transform(ofMesh &mesh, const ofMatrix4x4 &m);
 }
 
