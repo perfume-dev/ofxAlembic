@@ -5,6 +5,8 @@ using namespace Alembic::AbcGeom;
 
 bool Writer::open(string path, float fps)
 {
+	ofxAlembic::init();
+	
 	path = ofToDataPath(path);
 
 	archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), path);

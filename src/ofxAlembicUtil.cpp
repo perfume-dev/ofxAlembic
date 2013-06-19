@@ -1,5 +1,17 @@
 #include "ofxAlembicUtil.h"
 
+#include "H5public.h"
+
+static bool inited = false;
+
+void ofxAlembic::init()
+{
+	if (inited) return;
+	inited = true;
+	
+	H5dont_atexit();
+}
+
 void ofxAlembic::transform(ofMesh &mesh, const ofMatrix4x4 &m)
 {
 	vector<ofVec3f>& vertices = mesh.getVertices();

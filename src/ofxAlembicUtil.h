@@ -9,8 +9,9 @@
 
 namespace ofxAlembic
 {
-struct Point;
-void transform(ofMesh &mesh, const ofMatrix4x4 &m);
+	void init();
+	
+	void transform(ofMesh &mesh, const ofMatrix4x4 &m);
 }
 
 inline ofVec3f toOf(const Alembic::AbcGeom::V3f& v)

@@ -145,6 +145,8 @@ void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &obje
 
 bool ofxAlembic::Reader::open(string path)
 {
+	ofxAlembic::init();
+	
 	path = ofToDataPath(path);
 
 	m_archive = IArchive(Alembic::AbcCoreHDF5::ReadArchive(), path);
