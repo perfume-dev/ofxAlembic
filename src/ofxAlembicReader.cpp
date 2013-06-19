@@ -215,6 +215,48 @@ void ofxAlembic::Reader::dumpNames()
 	}
 }
 
+bool ofxAlembic::Reader::get(const string& path, ofMesh& mesh)
+{
+	IGeom *o = get(path);
+	if (o == NULL) return false;
+	return o->get(mesh);
+}
+
+bool ofxAlembic::Reader::get(const string& path, vector<ofPolyline>& curves)
+{
+	IGeom *o = get(path);
+	if (o == NULL) return false;
+	return o->get(curves);
+}
+
+bool ofxAlembic::Reader::get(const string& path, vector<ofVec3f>& points)
+{
+	IGeom *o = get(path);
+	if (o == NULL) return false;
+	return o->get(points);
+}
+
+bool ofxAlembic::Reader::get(size_t idx, ofMesh& mesh)
+{
+	IGeom *o = get(idx);
+	if (o == NULL) return false;
+	return o->get(mesh);
+}
+
+bool ofxAlembic::Reader::get(size_t idx, vector<ofPolyline>& curves)
+{
+	IGeom *o = get(idx);
+	if (o == NULL) return false;
+	return o->get(curves);
+}
+
+bool ofxAlembic::Reader::get(size_t idx, vector<ofVec3f>& points)
+{
+	IGeom *o = get(idx);
+	if (o == NULL) return false;
+	return o->get(points);
+}
+
 #pragma mark - IGeom
 
 IGeom::IGeom() : m_minTime(0), m_maxTime(0), type(UNKHOWN) {}

@@ -39,6 +39,8 @@ public:
 
 	bool open(string path);
 	void close();
+	
+	void dumpNames();
 
 	void setTime(double time);
 	float getTime() const { return current_time; }
@@ -48,19 +50,25 @@ public:
 
 	void draw();
 
-	IGeom* get(const string& path)
-	{
-		if (object_map.find(path) == object_map.end()) return NULL;
-
-		return object_map[path];
-	}
-
-	inline IGeom* get(size_t idx) { return object_arr[idx]; }
 	inline size_t size() const { return object_arr.size(); }
 	inline const vector<string>& getNames() const { return object_name_arr; }
 
-	void dumpNames();
+	bool get(const string& path, ofMesh& mesh);
+	bool get(const string& path, vector<ofPolyline>& curves);
+	bool get(const string& path, vector<ofVec3f>& points);
 
+	bool get(size_t idx, ofMesh& mesh);
+	bool get(size_t idx, vector<ofPolyline>& curves);
+	bool get(size_t idx, vector<ofVec3f>& points);
+
+	inline IGeom* get(size_t idx) { return object_arr[idx]; }
+	
+	IGeom* get(const string& path)
+	{
+		if (object_map.find(path) == object_map.end()) return NULL;
+		return object_map[path];
+	}
+	
 protected:
 
 	Alembic::AbcGeom::IArchive m_archive;

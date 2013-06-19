@@ -47,7 +47,7 @@ void testApp::draw()
 	
 	{
 		ofMesh mesh;
-		abc.get("/Cloner/ClonerShape")->get(mesh);
+		abc.get("/Cloner/ClonerShape", mesh);
 		
 		ofSetColor(255, 0, 0);
 		mesh.draw();
@@ -55,7 +55,7 @@ void testApp::draw()
 
 	{
 		vector<ofVec3f> points;
-		abc.get("/Emitter/EmitterCloud")->get(points);
+		abc.get("/Emitter/EmitterCloud", points);
 		
 		ofSetColor(0, 255, 0);
 		glBegin(GL_POINTS);
@@ -66,7 +66,7 @@ void testApp::draw()
 
 	{
 		vector<ofPolyline> curves;
-		abc.get("/Tracer/TracerSpline")->get(curves);
+		abc.get("/Tracer/TracerSpline", curves);
 		
 		ofSetColor(0, 0, 255);
 		for (int i = 0; i < curves.size(); i++)
