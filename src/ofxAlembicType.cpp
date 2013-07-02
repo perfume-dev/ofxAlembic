@@ -1,5 +1,11 @@
 #include "ofxAlembicType.h"
 
+
+#if (_MSC_VER)
+#include <stdint.h>
+#endif
+
+
 using namespace ofxAlembic;
 using namespace Alembic::AbcGeom;
 
@@ -18,7 +24,7 @@ void Points::get(OPointsSchema &schema) const
 	int num = points.size();
 
 	vector<V3f> positions(num);
-	vector<uint64_t> ids(num);
+	vector<::uint64_t> ids(num);
 
 	for (int i = 0; i < num; i++)
 	{
@@ -67,8 +73,8 @@ void Points::draw()
 void PolyMesh::get(OPolyMeshSchema &schema) const
 {
 	vector<V3f> positions;
-	vector<int32_t> indexes;
-	vector<int32_t> counts;
+	vector <::int32_t> indexes;
+	vector<::int32_t> counts;
 	vector<V2f> uvs;
 	vector<N3f> norms;
 
@@ -253,7 +259,7 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& trans
 
 	{
 		const V3f *points = m_meshP->get();
-		const int32_t *indices = m_meshIndices->get();
+		const ::int32_t *indices = m_meshIndices->get();
 
 		V3f dst;
 		vector<ofVec3f> verts;
@@ -338,7 +344,7 @@ void PolyMesh::draw()
 void Curves::get(OCurvesSchema &schema) const
 {
 	vector<V3f> positions;
-	vector<int32_t> num_vertices;
+	vector<::int32_t> num_vertices;
 
 	for (int n = 0; n < curves.size(); n++)
 	{

@@ -168,6 +168,7 @@ class totally_ordered
 
 // inspired by boost::mutex
 #ifdef _MSC_VER
+#define CreateMutex  CreateMutexW
 
 class mutex : noncopyable
 {

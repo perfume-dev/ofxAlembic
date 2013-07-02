@@ -35,7 +35,7 @@
 
 #if defined(WIN32) && !defined(__MWERKS__)
 #if defined(_SZDLL_)
-#pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
+#pragma warning(disable: 4273)  /* Disable the dll linkage warnings */
 #define __SZ_DLL__ __declspec(dllexport)
 /*#define __DLLVARH425__ __declspec(dllexport)*/
 #elif defined(_SZUSEDLL_)
@@ -47,7 +47,7 @@
 #endif /* _SZDLL_ */
 
 #else /*WIN32*/
-#define __SZ_DLL__
+#define __SZ_DLL__ extern
 /*#define __DLLVAR__ extern*/
 #endif
 
