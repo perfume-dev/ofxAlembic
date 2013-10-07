@@ -17,6 +17,7 @@ class IXform;
 class IPoints;
 class ICurves;
 class IPolyMesh;
+class ICamera;
 
 template <typename T>
 inline ofxAlembic::Type type2enum() { return ofxAlembic::UNKHOWN; }
@@ -56,10 +57,12 @@ public:
 	bool get(const string& path, ofMesh& mesh);
 	bool get(const string& path, vector<ofPolyline>& curves);
 	bool get(const string& path, vector<ofVec3f>& points);
+	bool get(const string& path, ofCamera &camera);
 
 	bool get(size_t idx, ofMesh& mesh);
 	bool get(size_t idx, vector<ofPolyline>& curves);
 	bool get(size_t idx, vector<ofVec3f>& points);
+	bool get(size_t idx, ofCamera &camera);
 
 	inline IGeom* get(size_t idx) { return object_arr[idx]; }
 	
@@ -204,6 +207,30 @@ protected:
 	void drawInternal() { polymesh.draw(); }
 };
 
+class ofxAlembic::ICamera : public ofxAlembic::IGeom
+{
+public:
+	
+	Camera camera;
+	
+	ICamera(Alembic::AbcGeom::ICamera object);
+	~ICamera()
+	{
+		if (m_camera)
+			m_camera.reset();
+	}
+	
+	const char* getTypeName() const { return "Camera"; }
+	
+protected:
+	
+	Alembic::AbcGeom::ICamera m_camera;
+	
+	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void drawInternal() { camera.draw(); }
+
+};
+
 //
 
 template <>
@@ -294,5 +321,18 @@ inline bool ofxAlembic::IGeom::get(ofMesh &o)
 	}
 
 	o = ((IPolyMesh*)this)->polymesh.mesh;
+	return true;
+}
+
+template <>
+inline bool ofxAlembic::IGeom::get(ofCamera &o)
+{
+	if (type != ofxAlembic::CAMERA)
+	{
+		ofLogError("ofxAlembic::IGeom") << "cast error";
+		return false;
+	}
+	
+	((ICamera*)this)->camera.updateParams(o);
 	return true;
 }

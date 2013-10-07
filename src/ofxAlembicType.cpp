@@ -397,3 +397,46 @@ void Curves::draw()
 		curves[i].draw();
 	}
 }
+
+
+#pragma mark - Camera
+
+void Camera::get(OCameraSchema &schema) const
+{
+	ofLogError("ofSoundPlayer") << "Camera::get(): not implemented";
+}
+
+void Camera::set(ICameraSchema &schema, float time, const Imath::M44f& transform)
+{
+	ISampleSelector ss(time, ISampleSelector::kNearIndex);
+	schema.get(sample, ss);
+	
+	for (int i = 0; i < 16; i++)
+		modelview.getPtr()[i] = transform.getValue()[i];
+}
+
+void Camera::updateParams(ofCamera &camera)
+{
+	float w, h;
+	if (width == 0 || height == 0)
+	{
+		w = ofGetViewportWidth();
+		h = ofGetViewportHeight();
+	}
+	else
+	{
+		w = width;
+		h = height;
+	}
+	
+	float fovH = sample.getFieldOfView();
+	float fovV = ofRadToDeg(2 * atanf(tanf(ofDegToRad(fovH) / 2) * (h / w)));
+	camera.setFov(fovV);
+	camera.setTransformMatrix(modelview);
+	
+	// TODO: lens offset
+}
+
+void Camera::draw()
+{
+}

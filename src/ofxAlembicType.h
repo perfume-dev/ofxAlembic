@@ -12,6 +12,7 @@ namespace ofxAlembic
 class PolyMesh;
 class Points;
 class Curves;
+class Camera;
 
 struct Point;
 
@@ -20,6 +21,7 @@ enum Type
 	POINTS = 0,
 	CURVES,
 	POLYMESH,
+	CAMERA,
 	UNKHOWN
 };
 }
@@ -78,4 +80,28 @@ public:
 	void set(Alembic::AbcGeom::ICurvesSchema &schema, float time, const Imath::M44f& transform);
 
 	void draw();
+};
+
+class ofxAlembic::Camera
+{
+public:
+
+	Camera() : width(0), height(0) {}
+	Camera(const ofCamera& camera) : width(0), height(0) {}
+	
+	void get(Alembic::AbcGeom::OCameraSchema &schema) const;
+	void set(Alembic::AbcGeom::ICameraSchema &schema, float time, const Imath::M44f& transform);
+	
+	void setViewport(int width, int height) { this->width = width, this->height = height; }
+	
+	void updateParams(ofCamera &camera);
+	
+	void draw();
+	
+protected:
+	
+	int width, height;
+	Alembic::AbcGeom::CameraSample sample;
+	
+	ofMatrix4x4 modelview;
 };

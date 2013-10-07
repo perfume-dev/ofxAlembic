@@ -131,6 +131,31 @@ void ofxAlembic::IPolyMesh::updateWithTimeInternal(double time, Imath::M44f& tra
 	polymesh.set(m_polyMesh.getSchema(), time, transform);
 }
 
+#pragma mark - ICamera
+
+ofxAlembic::ICamera::ICamera(Alembic::AbcGeom::ICamera object) : ofxAlembic::IGeom(object), m_camera(object)
+{
+	TimeSamplingPtr iTsmp = m_camera.getSchema().getTimeSampling();
+	if (!m_camera.getSchema().isConstant())
+	{
+		size_t numSamps =  m_camera.getSchema().getNumSamples();
+		if (numSamps > 0)
+		{
+			chrono_t minTime = iTsmp->getSampleTime(0);
+			m_minTime = std::min(m_minTime, minTime);
+			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
+			m_maxTime = std::max(m_maxTime, maxTime);
+		}
+	}
+	
+	type = CAMERA;
+}
+
+void ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& transform)
+{
+	camera.set(m_camera.getSchema(), time, transform);
+}
+
 #pragma mark - Reader
 
 void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_map)
@@ -238,6 +263,13 @@ bool ofxAlembic::Reader::get(const string& path, vector<ofVec3f>& points)
 	return o->get(points);
 }
 
+bool ofxAlembic::Reader::get(const string& path, ofCamera &camera)
+{
+	IGeom *o = get(path);
+	if (o == NULL) return false;
+	return o->get(camera);
+}
+
 bool ofxAlembic::Reader::get(size_t idx, ofMesh& mesh)
 {
 	IGeom *o = get(idx);
@@ -257,6 +289,13 @@ bool ofxAlembic::Reader::get(size_t idx, vector<ofVec3f>& points)
 	IGeom *o = get(idx);
 	if (o == NULL) return false;
 	return o->get(points);
+}
+
+bool ofxAlembic::Reader::get(size_t idx, ofCamera &camera)
+{
+	IGeom *o = get(idx);
+	if (o == NULL) return false;
+	return o->get(camera);
 }
 
 #pragma mark - IGeom
@@ -340,13 +379,17 @@ void IGeom::setupWithObject(IObject object)
 //				dptr.reset( new ISubDDrw( subd ) );
 //			}
 		}
+		else if (Alembic::AbcGeom::ICamera::matches(ohead))
+		{
+			Alembic::AbcGeom::ICamera camera(object, ohead.getName());
+			if (camera)
+			{
+				dptr.reset(new ofxAlembic::ICamera(camera));
+			}
+		}
 		else
 		{
-			Alembic::AbcGeom::IObject object(object, ohead.getName());
-			if (object)
-			{
-				dptr.reset(new ofxAlembic::IGeom(object));
-			}
+			ofLogError("ofxAlembic") << "unknown object type: " << ohead.getFullName();
 		}
 
 		if (dptr && dptr->valid())
