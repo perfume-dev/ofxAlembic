@@ -5,40 +5,29 @@ using namespace Alembic::AbcGeom;
 
 #pragma mark - IXform
 
-class ofxAlembic::IXform : public ofxAlembic::IGeom
+ofxAlembic::IXform::IXform(Alembic::AbcGeom::IXform object) : ofxAlembic::IGeom(object), m_xform(object)
 {
-public:
-
-	IXform(Alembic::AbcGeom::IXform object) : ofxAlembic::IGeom(object), m_xform(object)
+	TimeSamplingPtr iTsmp = m_xform.getSchema().getTimeSampling();
+	if (!m_xform.getSchema().isConstant())
 	{
-		TimeSamplingPtr iTsmp = m_xform.getSchema().getTimeSampling();
-		if (!m_xform.getSchema().isConstant())
+		size_t numSamps =  m_xform.getSchema().getNumSamples();
+		if (numSamps > 0)
 		{
-			size_t numSamps =  m_xform.getSchema().getNumSamples();
-			if (numSamps > 0)
-			{
-				chrono_t minTime = iTsmp->getSampleTime(0);
-				m_minTime = std::min(m_minTime, minTime);
-				chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-				m_maxTime = std::max(m_maxTime, maxTime);
-			}
+			chrono_t minTime = iTsmp->getSampleTime(0);
+			m_minTime = std::min(m_minTime, minTime);
+			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
+			m_maxTime = std::max(m_maxTime, maxTime);
 		}
 	}
+	
+	type = XFORM;
+}
 
-	~IXform()
-	{
-		if (m_xform)
-			m_xform.reset();
-	}
-
-	const char* getTypeName() const { return "Xform"; }
-
-protected:
-
-	Alembic::AbcGeom::IXform m_xform;
-
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
-};
+ofxAlembic::IXform::~IXform()
+{
+	if (m_xform)
+		m_xform.reset();
+}
 
 void ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& transform)
 {
@@ -53,6 +42,12 @@ void ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& transf
 		dst[i] = src[i];
 
 	transform = mat * transform;
+	
+	for (int i = 0; i < 16; i++)
+	{
+		xform.local_matrix.getPtr()[i] = mat.getValue()[i];
+		xform.global_matrix.getPtr()[i] = transform.getValue()[i];
+	}
 }
 
 #pragma mark - IPoints
@@ -242,6 +237,13 @@ void ofxAlembic::Reader::dumpNames()
 	}
 }
 
+bool ofxAlembic::Reader::get(const string& path, ofMatrix4x4& matrix)
+{
+	IGeom *o = get(path);
+	if (o == NULL) return false;
+	return o->get(matrix);
+}
+
 bool ofxAlembic::Reader::get(const string& path, ofMesh& mesh)
 {
 	IGeom *o = get(path);
@@ -268,6 +270,13 @@ bool ofxAlembic::Reader::get(const string& path, ofCamera &camera)
 	IGeom *o = get(path);
 	if (o == NULL) return false;
 	return o->get(camera);
+}
+
+bool ofxAlembic::Reader::get(size_t idx, ofMatrix4x4& matrix)
+{
+	IGeom *o = get(idx);
+	if (o == NULL) return false;
+	return o->get(matrix);
 }
 
 bool ofxAlembic::Reader::get(size_t idx, ofMesh& mesh)
@@ -319,7 +328,7 @@ IGeom::~IGeom()
 void IGeom::setupWithObject(IObject object)
 {
 	size_t numChildren = object.getNumChildren();
-
+	
 	for (size_t i = 0; i < numChildren; ++i)
 	{
 		const ObjectHeader &ohead = object.getChildHeader(i);

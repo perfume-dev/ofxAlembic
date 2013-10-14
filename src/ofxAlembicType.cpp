@@ -3,6 +3,25 @@
 using namespace ofxAlembic;
 using namespace Alembic::AbcGeom;
 
+#pragma mark - XForm
+
+void XForm::get(Alembic::AbcGeom::OPolyMeshSchema &schema) const
+{
+	ofLogError("ofxAlembic::XForm") << "not implemented";
+}
+
+void XForm::set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform)
+{
+}
+
+void XForm::draw()
+{
+	ofPushMatrix();
+	ofMultMatrix(global_matrix);
+	ofDrawAxis(10);
+	ofPopMatrix();
+}
+
 #pragma mark - Points
 
 Points::Points(const vector<ofVec3f>& ofpoints)
@@ -403,7 +422,7 @@ void Curves::draw()
 
 void Camera::get(OCameraSchema &schema) const
 {
-	ofLogError("ofSoundPlayer") << "Camera::get(): not implemented";
+	ofLogError("ofxAlembic::Camera") << "not implemented";
 }
 
 void Camera::set(ICameraSchema &schema, float time, const Imath::M44f& transform)

@@ -13,6 +13,7 @@ class PolyMesh;
 class Points;
 class Curves;
 class Camera;
+class XForm;
 
 struct Point;
 
@@ -22,21 +23,23 @@ enum Type
 	CURVES,
 	POLYMESH,
 	CAMERA,
+	XFORM,
 	UNKHOWN
 };
 }
 
-struct ofxAlembic::Point
+class ofxAlembic::XForm
 {
-	uint64_t id;
-	ofVec3f pos;
+public:
+	ofMatrix4x4 local_matrix;
+	ofMatrix4x4 global_matrix;
+	
+	XForm() {}
+	
+	void get(Alembic::AbcGeom::OPolyMeshSchema &schema) const;
+	void set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform);
 
-	Point() : id(-1) {}
-	Point(const ofVec3f& pos) : id(-1), pos(pos) {}
-	Point(uint64_t id, const ofVec3f& pos) : id(id), pos(pos) {}
-
-	Point(float x, float y, float z) : id(-1), pos(x, y, z) {}
-	Point(uint64_t id, float x, float y, float z) : id(id), pos(x, y, z) {}
+	void draw();
 };
 
 class ofxAlembic::PolyMesh
@@ -51,6 +54,19 @@ public:
 	void set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform);
 
 	void draw();
+};
+
+struct ofxAlembic::Point
+{
+	uint64_t id;
+	ofVec3f pos;
+	
+	Point() : id(-1) {}
+	Point(const ofVec3f& pos) : id(-1), pos(pos) {}
+	Point(uint64_t id, const ofVec3f& pos) : id(id), pos(pos) {}
+	
+	Point(float x, float y, float z) : id(-1), pos(x, y, z) {}
+	Point(uint64_t id, float x, float y, float z) : id(id), pos(x, y, z) {}
 };
 
 class ofxAlembic::Points

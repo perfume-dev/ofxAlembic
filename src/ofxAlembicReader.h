@@ -23,6 +23,9 @@ template <typename T>
 inline ofxAlembic::Type type2enum() { return ofxAlembic::UNKHOWN; }
 
 template <>
+inline ofxAlembic::Type type2enum<ofxAlembic::XForm>() { return ofxAlembic::XFORM; }
+	
+template <>
 inline ofxAlembic::Type type2enum<ofxAlembic::Points>() { return ofxAlembic::POINTS; }
 
 template <>
@@ -54,11 +57,13 @@ public:
 	inline size_t size() const { return object_arr.size(); }
 	inline const vector<string>& getNames() const { return object_name_arr; }
 
+	bool get(const string& path, ofMatrix4x4& matrix);
 	bool get(const string& path, ofMesh& mesh);
 	bool get(const string& path, vector<ofPolyline>& curves);
 	bool get(const string& path, vector<ofVec3f>& points);
 	bool get(const string& path, ofCamera &camera);
 
+	bool get(size_t idx, ofMatrix4x4& matrix);
 	bool get(size_t idx, ofMesh& mesh);
 	bool get(size_t idx, vector<ofPolyline>& curves);
 	bool get(size_t idx, vector<ofVec3f>& points);
@@ -136,6 +141,25 @@ protected:
 	Alembic::AbcGeom::chrono_t m_maxTime;
 
 	static void visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_map);
+};
+
+class ofxAlembic::IXform : public ofxAlembic::IGeom
+{
+public:
+	
+	XForm xform;
+	
+	IXform(Alembic::AbcGeom::IXform object);
+	~IXform();
+	
+	const char* getTypeName() const { return "Xform"; }
+	
+protected:
+	
+	Alembic::AbcGeom::IXform m_xform;
+	
+	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void drawInternal() { xform.draw(); }
 };
 
 class ofxAlembic::IPoints : public ofxAlembic::IGeom
@@ -232,6 +256,32 @@ protected:
 };
 
 //
+
+template <>
+inline bool ofxAlembic::IGeom::get(ofxAlembic::XForm &o)
+{
+	if (type != ofxAlembic::XFORM)
+	{
+		ofLogError("ofxAlembic::IXform") << "cast error";
+		return false;
+	}
+	
+	o = ((IXform*)this)->xform;
+	return true;
+}
+
+template <>
+inline bool ofxAlembic::IGeom::get(ofMatrix4x4 &o)
+{
+	if (type != ofxAlembic::XFORM)
+	{
+		ofLogError("ofxAlembic::IXform") << "cast error";
+		return false;
+	}
+	
+	o = ((IXform*)this)->xform.global_matrix;
+	return true;
+}
 
 template <>
 inline bool ofxAlembic::IGeom::get(ofxAlembic::Points &o)
