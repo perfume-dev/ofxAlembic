@@ -109,6 +109,7 @@ public:
 
 	void draw();
 
+	size_t getIndex() const { return index; }
 	string getName() const;
 	virtual const char* getTypeName() const { return ""; }
 
@@ -127,6 +128,8 @@ public:
 protected:
 
 	Type type;
+	
+	size_t index;
 
 	Alembic::AbcGeom::IObject m_object;
 	vector<ofPtr<IGeom> > m_children;
@@ -159,7 +162,20 @@ protected:
 	Alembic::AbcGeom::IXform m_xform;
 	
 	void updateWithTimeInternal(double time, Imath::M44f& transform);
-	void drawInternal() { xform.draw(); }
+	void drawInternal()
+	{
+		ofPushStyle();
+		
+		stringstream ss;
+		ss << "[" << getIndex() << "]";
+		
+		ofSetColor(255);
+		ofDrawBitmapString(ss.str(), xform.global_matrix.getTranslation());
+		
+		ofPopStyle();
+		
+		xform.draw();
+	}
 };
 
 class ofxAlembic::IPoints : public ofxAlembic::IGeom

@@ -403,6 +403,7 @@ void IGeom::setupWithObject(IObject object)
 
 		if (dptr && dptr->valid())
 		{
+			dptr->index = m_children.size();
 			m_children.push_back(dptr);
 			m_minTime = std::min(m_minTime, dptr->m_minTime);
 			m_maxTime = std::max(m_maxTime, dptr->m_maxTime);

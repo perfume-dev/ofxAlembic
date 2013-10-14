@@ -7,7 +7,6 @@ using namespace Alembic::AbcGeom;
 
 void XForm::get(Alembic::AbcGeom::OPolyMeshSchema &schema) const
 {
-	ofLogError("ofxAlembic::XForm") << "not implemented";
 }
 
 void XForm::set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform)
