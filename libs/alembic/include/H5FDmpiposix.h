@@ -14,7 +14,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 /*
- * Programmer:  Quincey Koziol <koziol@hdfgroup.org>
+ * Programmer:  Quincey Koziol <koziol@ncsa.uiuc.edu>
  *              Thursday, July 11, 2002
  *
  * Purpose:	The public header file for the mpiposix driver.
@@ -24,12 +24,15 @@
 #define __H5FDmpiposix_H
 
 #ifdef H5_HAVE_PARALLEL
-#   define H5FD_MPIPOSIX    (H5FD_mpiposix_init())
+#   define H5FD_MPIPOSIX	(H5FD_mpiposix_init())
 #else
-#   define H5FD_MPIPOSIX    (-1)
+#   define H5FD_MPIPOSIX	(-1)
 #endif
 
 /* Macros */
+
+#define IS_H5FD_MPIPOSIX(f)	/* (H5F_t *f) */				    \
+    (H5FD_MPIPOSIX==H5F_DRIVER_ID(f))
 
 #ifdef H5_HAVE_PARALLEL
 
@@ -50,3 +53,4 @@ H5_DLL herr_t H5Pget_fapl_mpiposix(hid_t fapl_id, MPI_Comm *comm/*out*/, hbool_t
 #endif /*H5_HAVE_PARALLEL*/
 
 #endif /* __H5FDmpiposix_H */
+

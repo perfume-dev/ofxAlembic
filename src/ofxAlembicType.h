@@ -7,6 +7,7 @@
 
 #include "ofxAlembicUtil.h"
 
+
 namespace ofxAlembic
 {
 class PolyMesh;

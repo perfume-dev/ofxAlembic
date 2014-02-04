@@ -12,5 +12,5 @@
 // own semaphore implementation.
 //
 
-/* #undef HAVE_POSIX_SEMAPHORES */
+#define HAVE_POSIX_SEMAPHORES 1
 
