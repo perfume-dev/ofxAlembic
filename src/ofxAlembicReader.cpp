@@ -163,13 +163,17 @@ void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &obje
 	object_map[obj->getName()] = obj.get();
 }
 
-bool ofxAlembic::Reader::open(string path)
+bool ofxAlembic::Reader::open(const string& path)
 {
 	ofxAlembic::init();
 	
-	path = ofToDataPath(path);
+	if (!ofFile::doesFileExist(path))
+	{
+		ofLogError("ofxAlembic") << "file not found: " << path;
+		return false;
+	}
 
-	m_archive = IArchive(Alembic::AbcCoreHDF5::ReadArchive(), path);
+	m_archive = IArchive(Alembic::AbcCoreHDF5::ReadArchive(), ofToDataPath(path));
 	if (!m_archive.valid()) return false;
 
 	m_root = ofPtr<IGeom>(new IGeom(m_archive.getTop()));

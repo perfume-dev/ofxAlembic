@@ -1,6 +1,6 @@
 //-*****************************************************************************
 //
-// Copyright (c) 2009-2011,
+// Copyright (c) 2009-2013,
 //  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
@@ -65,6 +65,9 @@
 #include <Alembic/Abc/OSchemaObject.h>
 #include <Alembic/Abc/OTypedArrayProperty.h>
 #include <Alembic/Abc/OTypedScalarProperty.h>
+
+#include <Alembic/Abc/Reference.h>
+#include <Alembic/Abc/SourceName.h>
 
 #include <Alembic/Abc/TypedArraySample.h>
 #include <Alembic/Abc/TypedPropertyTraits.h>

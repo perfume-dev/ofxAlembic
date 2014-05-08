@@ -19,7 +19,7 @@ public:
 
 	~Writer() { close(); }
 
-	bool open(string path, float fps = 30);
+	bool open(const string& path, float fps = 30);
 	void close();
 
 	void addPoints(const string& path, const Points& points);

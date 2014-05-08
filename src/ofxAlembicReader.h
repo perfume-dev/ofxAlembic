@@ -41,7 +41,7 @@ public:
 
 	~Reader() {}
 
-	bool open(string path);
+	bool open(const string& path);
 	void close();
 	
 	void dumpNames();

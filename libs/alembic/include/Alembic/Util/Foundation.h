@@ -1,6 +1,6 @@
 //-*****************************************************************************
 //
-// Copyright (c) 2009-2012,
+// Copyright (c) 2009-2013,
 //  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
@@ -87,16 +87,17 @@
 
 #ifdef _MSC_VER
 
-#ifndef NOMINMAX
-#define NOMINMAX
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 #endif
 
-#define _WINSOCKAPI_
 // needed for mutex stuff
 #include <Windows.h>
 #endif
 
-#define ALEMBIC_VERSION_NS v5
+#ifndef ALEMBIC_VERSION_NS
+#define ALEMBIC_VERSION_NS v7
+#endif
 
 namespace Alembic {
 namespace Util {
@@ -109,6 +110,7 @@ using boost::shared_ptr;
 using boost::static_pointer_cast;
 using boost::weak_ptr;
 using boost::unordered_map;
+#define ALEMBIC_LIB_USES_BOOST
 #elif defined(__GXX_EXPERIMENTAL_CXX0X) || __cplusplus >= 201103L
 using std::dynamic_pointer_cast;
 using std::enable_shared_from_this;

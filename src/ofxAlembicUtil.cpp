@@ -9,6 +9,8 @@ void ofxAlembic::init()
 	if (inited) return;
 	inited = true;
 	
+	ofLogVerbose("ofxAlembic") << "alembic version: " << Alembic::Abc::GetLibraryVersionShort();
+	
 	H5dont_atexit();
 }
 

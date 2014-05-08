@@ -3,13 +3,17 @@
 using namespace ofxAlembic;
 using namespace Alembic::AbcGeom;
 
-bool Writer::open(string path, float fps)
+bool Writer::open(const string& path, float fps)
 {
 	ofxAlembic::init();
 	
-	path = ofToDataPath(path);
-
-	archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), path);
+	if (!ofFile::doesFileExist(path))
+	{
+		ofLogError("ofxAlembic") << "file not found: " << path;
+		return false;
+	}
+	
+	archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), ofToDataPath(path));
 	if (!archive.valid()) return false;
 
 	archive.setCompressionHint(1);

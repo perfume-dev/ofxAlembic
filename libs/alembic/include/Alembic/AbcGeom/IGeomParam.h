@@ -1,6 +1,6 @@
 //-*****************************************************************************
 //
-// Copyright (c) 2009-2012,
+// Copyright (c) 2009-2014,
 //  Sony Pictures Imageworks Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
@@ -74,8 +74,7 @@ public:
             m_isIndexed = false;
         }
 
-        bool valid() const
-        { return m_vals; }
+        bool valid() const { return m_vals.get() != NULL; }
 
         ALEMBIC_OPERATOR_BOOL( valid() );
 
@@ -354,8 +353,6 @@ void
 ITypedGeomParam<TRAITS>::getExpanded( typename ITypedGeomParam<TRAITS>::Sample &oSamp,
                                       const Abc::ISampleSelector &iSS ) const
 {
-    typedef typename TRAITS::value_type value_type;
-
     oSamp.m_scope = this->getScope();
     oSamp.m_isIndexed = m_isIndexed;
 
@@ -365,13 +362,21 @@ ITypedGeomParam<TRAITS>::getExpanded( typename ITypedGeomParam<TRAITS>::Sample &
     }
     else
     {
-        Alembic::Util::shared_ptr< Abc::TypedArraySample<TRAITS> > valPtr = \
-            m_valProp.getValue( iSS );
         Abc::UInt32ArraySamplePtr idxPtr = m_indicesProperty.getValue( iSS );
 
         size_t size = idxPtr->size();
 
-        value_type *v = new value_type[size];
+        // no indices?  just return what we have in our values
+        if (size == 0)
+        {
+            m_valProp.get( oSamp.m_vals, iSS );
+            return;
+        }
+
+        Alembic::Util::shared_ptr< Abc::TypedArraySample<TRAITS> > valPtr = \
+            m_valProp.getValue( iSS );
+
+        typename TRAITS::value_type *v = new typename TRAITS::value_type[size];
 
         for ( size_t i = 0 ; i < size ; ++i )
         {
@@ -388,7 +393,7 @@ ITypedGeomParam<TRAITS>::getExpanded( typename ITypedGeomParam<TRAITS>::Sample &
         const Alembic::Util::Dimensions dims( size );
 
         oSamp.m_vals.reset( new Abc::TypedArraySample<TRAITS>( v, dims ),
-                            AbcA::TArrayDeleter<value_type>() );
+                            AbcA::TArrayDeleter<typename TRAITS::value_type>());
     }
 
 }

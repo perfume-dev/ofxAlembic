@@ -18,9 +18,8 @@
 /* Define if C++ compiler recognizes offsetof */
 /* #undef H5_CXX_HAVE_OFFSETOF */
 
-/* Define a macro for Cygwin (on XP only) where the compiler has rounding
-   problem converting from unsigned long long to long double */
-/* #undef H5_CYGWIN_ULLONG_TO_LDOUBLE_ROUND_PROBLEM */
+/* Define the default plugins path to compile */
+#define H5_DEFAULT_PLUGINDIR "/usr/local/hdf5/lib/plugin"
 
 /* Define the default virtual file driver to compile */
 #define H5_DEFAULT_VFD H5FD_SEC2
@@ -507,7 +506,7 @@
 #define H5_PACKAGE_NAME "HDF5"
 
 /* Define to the full name and version of this package. */
-#define H5_PACKAGE_STRING "HDF5 1.8.11"
+#define H5_PACKAGE_STRING "HDF5 1.8.12"
 
 /* Define to the one symbol short name of this package. */
 #define H5_PACKAGE_TARNAME "hdf5"
@@ -516,7 +515,7 @@
 #define H5_PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define H5_PACKAGE_VERSION "1.8.11"
+#define H5_PACKAGE_VERSION "1.8.12"
 
 /* Width for printf() for type `long long' or `__int64', use `ll' */
 #define H5_PRINTF_LL_WIDTH "ll"
@@ -679,7 +678,7 @@
 /* #undef H5_USING_MEMCHECKER */
 
 /* Version number of package */
-#define H5_VERSION "1.8.11"
+#define H5_VERSION "1.8.12"
 
 /* Define if vsnprintf() returns the correct value for formatted strings that
    don't fit into size allowed */
