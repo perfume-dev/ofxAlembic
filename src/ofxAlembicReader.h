@@ -53,6 +53,7 @@ public:
 	inline float getMaxTime() const { return m_maxTime; }
 
 	void draw();
+	void debugDraw();
 
 	inline size_t size() const { return object_arr.size(); }
 	inline const vector<string>& getNames() const { return object_name_arr; }
@@ -108,6 +109,7 @@ public:
 	virtual bool valid() { return m_object; }
 
 	void draw();
+	void debugDraw();
 
 	size_t getIndex() const { return index; }
 	string getName() const;
@@ -139,6 +141,7 @@ protected:
 
 	virtual void updateWithTimeInternal(double time, Imath::M44f& transform) {}
 	virtual void drawInternal() {}
+	virtual void debugDrawInternal() {}
 
 	Alembic::AbcGeom::chrono_t m_minTime;
 	Alembic::AbcGeom::chrono_t m_maxTime;
@@ -162,7 +165,7 @@ protected:
 	Alembic::AbcGeom::IXform m_xform;
 	
 	void updateWithTimeInternal(double time, Imath::M44f& transform);
-	void drawInternal()
+	void debugDrawInternal()
 	{
 		ofPushStyle();
 		

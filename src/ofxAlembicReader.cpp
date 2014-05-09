@@ -220,6 +220,13 @@ void ofxAlembic::Reader::draw()
 	m_root->draw();
 }
 
+void ofxAlembic::Reader::debugDraw()
+{
+	if (!m_root) return;
+	
+	m_root->debugDraw();
+}
+
 void ofxAlembic::Reader::setTime(double time)
 {
 	if (!m_root) return;
@@ -423,6 +430,17 @@ void IGeom::draw()
 	{
 		ofPtr<IGeom> c = m_children[i];
 		c->draw();
+	}
+}
+
+void IGeom::debugDraw()
+{
+	debugDrawInternal();
+	
+	for (int i = 0; i < m_children.size(); i++)
+	{
+		ofPtr<IGeom> c = m_children[i];
+		c->debugDraw();
 	}
 }
 
