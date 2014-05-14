@@ -7,12 +7,6 @@ bool Writer::open(const string& path, float fps)
 {
 	ofxAlembic::init();
 	
-	if (!ofFile::doesFileExist(path))
-	{
-		ofLogError("ofxAlembic") << "file not found: " << path;
-		return false;
-	}
-	
 	archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), ofToDataPath(path));
 	if (!archive.valid()) return false;
 
