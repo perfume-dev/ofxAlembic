@@ -31,14 +31,6 @@ enum Type
 class ofxAlembic::XForm
 {
 public:
-	ofMatrix4x4 local_matrix;
-	ofMatrix4x4 global_matrix;
-	
-	XForm() {}
-	
-	void get(Alembic::AbcGeom::OPolyMeshSchema &schema) const;
-	void set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform);
-
 	void draw();
 };
 
@@ -46,13 +38,12 @@ class ofxAlembic::PolyMesh
 {
 public:
 	ofMesh mesh;
-	ofMatrix4x4 matrix;
 
 	PolyMesh() {}
 	PolyMesh(const ofMesh& mesh) : mesh(mesh) {}
 
 	void get(Alembic::AbcGeom::OPolyMeshSchema &schema) const;
-	void set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform);
+	void set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time);
 
 	void draw();
 };
@@ -74,14 +65,13 @@ class ofxAlembic::Points
 {
 public:
 	vector<Point> points;
-	ofMatrix4x4 matrix;
 	
 	Points() {}
 	Points(const vector<ofVec3f>& points);
 	Points(const vector<Point>& points) : points(points) {}
 
 	void get(Alembic::AbcGeom::OPointsSchema &schema) const;
-	void set(Alembic::AbcGeom::IPointsSchema &schema, float time, const Imath::M44f& transform);
+	void set(Alembic::AbcGeom::IPointsSchema &schema, float time);
 
 	void draw();
 };
@@ -90,13 +80,12 @@ class ofxAlembic::Curves
 {
 public:
 	vector<ofPolyline> curves;
-	ofMatrix4x4 matrix;
 
 	Curves() {}
 	Curves(const vector<ofPolyline> &curves) : curves(curves) {}
 
 	void get(Alembic::AbcGeom::OCurvesSchema &schema) const;
-	void set(Alembic::AbcGeom::ICurvesSchema &schema, float time, const Imath::M44f& transform);
+	void set(Alembic::AbcGeom::ICurvesSchema &schema, float time);
 
 	void draw();
 };
@@ -109,11 +98,11 @@ public:
 	Camera(const ofCamera& camera) : width(0), height(0) {}
 	
 	void get(Alembic::AbcGeom::OCameraSchema &schema) const;
-	void set(Alembic::AbcGeom::ICameraSchema &schema, float time, const Imath::M44f& transform);
+	void set(Alembic::AbcGeom::ICameraSchema &schema, float time);
 	
 	void setViewport(int width, int height) { this->width = width, this->height = height; }
 	
-	void updateParams(ofCamera &camera);
+	void updateParams(ofCamera &camera, ofMatrix4x4 xform);
 	
 	void draw();
 	
@@ -121,6 +110,4 @@ protected:
 	
 	int width, height;
 	Alembic::AbcGeom::CameraSample sample;
-	
-	ofMatrix4x4 modelview;
 };

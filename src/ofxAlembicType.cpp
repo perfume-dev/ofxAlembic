@@ -5,20 +5,9 @@ using namespace Alembic::AbcGeom;
 
 #pragma mark - XForm
 
-void XForm::get(Alembic::AbcGeom::OPolyMeshSchema &schema) const
-{
-}
-
-void XForm::set(Alembic::AbcGeom::IPolyMeshSchema &schema, float time, const Imath::M44f& transform)
-{
-}
-
 void XForm::draw()
 {
-	ofPushMatrix();
-	ofMultMatrix(global_matrix);
 	ofDrawAxis(10);
-	ofPopMatrix();
 }
 
 #pragma mark - Points
@@ -49,12 +38,8 @@ void Points::get(OPointsSchema &schema) const
 	schema.set(sample);
 }
 
-void Points::set(IPointsSchema &schema, float time, const Imath::M44f& transform)
+void Points::set(IPointsSchema &schema, float time)
 {
-	matrix = toOf(transform);
-	
-	if (schema.isConstant() && points.size() > 0) return;
-	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	IPointsSchema::Sample sample;
 	schema.get(sample, ss);
@@ -69,22 +54,19 @@ void Points::set(IPointsSchema &schema, float time, const Imath::M44f& transform
 
 	for (int i = 0; i < num_points; i++)
 	{
-		transform.multVecMatrix(src[i], dst);
-		points[i] = toOf(dst);
+		const V3f& v = src[i];
+		points[i].pos.set(v.x, v.y, v.z);
 	}
 }
 
 void Points::draw()
 {
-	ofPushMatrix();
-	ofMultMatrix(matrix);
 	glBegin(GL_POINTS);
 	for (int i = 0; i < points.size(); i++)
 	{
 		glVertex3fv(points[i].pos.getPtr());
 	}
 	glEnd();
-	ofPopMatrix();
 }
 
 #pragma mark - PolyMesh
@@ -207,12 +189,8 @@ void PolyMesh::get(OPolyMeshSchema &schema) const
 	schema.set(sample);
 }
 
-void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& transform)
+void PolyMesh::set(IPolyMeshSchema &schema, float time)
 {
-	matrix = toOf(transform);
-	
-	if (schema.isConstant() && mesh.getNumVertices() > 0) return;
-
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	IPolyMeshSchema::Sample sample;
 	schema.get(sample, ss);
@@ -359,10 +337,14 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& trans
 
 void PolyMesh::draw()
 {
-	ofPushMatrix();
-	ofMultMatrix(matrix);
-	mesh.drawWireframe();
-	ofPopMatrix();
+	if (ofGetStyle().bFill)
+	{
+		mesh.draw();
+	}
+	else
+	{
+		mesh.drawWireframe();
+	}
 }
 
 #pragma mark - Curves
@@ -391,12 +373,8 @@ void Curves::get(OCurvesSchema &schema) const
 	schema.set(sample);
 }
 
-void Curves::set(ICurvesSchema &schema, float time, const Imath::M44f& transform)
+void Curves::set(ICurvesSchema &schema, float time)
 {
-	matrix = toOf(transform);
-	
-	if (schema.isConstant() && curves.size() > 0) return;
-	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	ICurvesSchema::Sample sample;
 	schema.get(sample, ss);
@@ -428,13 +406,10 @@ void Curves::set(ICurvesSchema &schema, float time, const Imath::M44f& transform
 
 void Curves::draw()
 {
-	ofPushMatrix();
-	ofMultMatrix(matrix);
 	for (int i = 0; i < curves.size(); i++)
 	{
 		curves[i].draw();
 	}
-	ofPopMatrix();
 }
 
 
@@ -445,16 +420,13 @@ void Camera::get(OCameraSchema &schema) const
 	ofLogError("ofxAlembic::Camera") << "not implemented";
 }
 
-void Camera::set(ICameraSchema &schema, float time, const Imath::M44f& transform)
+void Camera::set(ICameraSchema &schema, float time)
 {
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	schema.get(sample, ss);
-	
-	for (int i = 0; i < 16; i++)
-		modelview.getPtr()[i] = transform.getValue()[i];
 }
 
-void Camera::updateParams(ofCamera &camera)
+void Camera::updateParams(ofCamera &camera, ofMatrix4x4 xform)
 {
 	float w, h;
 	if (width == 0 || height == 0)
@@ -471,7 +443,7 @@ void Camera::updateParams(ofCamera &camera)
 	float fovH = sample.getFieldOfView();
 	float fovV = ofRadToDeg(2 * atanf(tanf(ofDegToRad(fovH) / 2) * (h / w)));
 	camera.setFov(fovV);
-	camera.setTransformMatrix(modelview);
+	camera.setTransformMatrix(xform);
 	
 	// TODO: lens offset
 }

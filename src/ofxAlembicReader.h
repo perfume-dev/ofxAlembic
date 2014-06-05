@@ -119,10 +119,14 @@ public:
 
 	void draw();
 	void debugDraw();
+	
+	inline const ofMatrix4x4& getGlobalTransform() const { return transform; }
 
 	size_t getIndex() const { return index; }
+	
 	string getName() const;
 	string getFullName() const;
+	
 	virtual const char* getTypeName() const { return ""; }
 
 	inline bool isTypeOf(Type t) const { return type == t; }
@@ -142,14 +146,16 @@ protected:
 	Type type;
 	
 	size_t index;
+	bool inited;
+	ofMatrix4x4 transform;
 
 	Alembic::AbcGeom::IObject m_object;
 	vector<ofPtr<IGeom> > m_children;
 
 	virtual void setupWithObject(Alembic::AbcGeom::IObject);
-	void updateWithTime(double time, Imath::M44f& transform);
+	void updateWithTime(double time, Imath::M44f& xform);
 
-	virtual void updateWithTimeInternal(double time, Imath::M44f& transform) {}
+	virtual void updateWithTimeInternal(double time, Imath::M44f& xform) {}
 	virtual void drawInternal() {}
 	virtual void debugDrawInternal() {}
 
@@ -174,7 +180,7 @@ protected:
 	
 	Alembic::AbcGeom::IXform m_xform;
 	
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void debugDrawInternal()
 	{
 		ofPushStyle();
@@ -183,7 +189,7 @@ protected:
 		ss << "[" << getName() << "]";
 		
 		ofSetColor(255);
-		ofDrawBitmapString(ss.str(), xform.global_matrix.getTranslation());
+		ofDrawBitmapString(ss.str(), 0, 0);
 		
 		ofPopStyle();
 		
@@ -210,7 +216,7 @@ protected:
 
 	Alembic::AbcGeom::IPoints m_points;
 
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { points.draw(); }
 };
 
@@ -233,7 +239,7 @@ protected:
 
 	Alembic::AbcGeom::ICurves m_curves;
 
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { curves.draw(); }
 };
 
@@ -256,7 +262,7 @@ protected:
 
 	Alembic::AbcGeom::IPolyMesh m_polyMesh;
 
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { polymesh.draw(); }
 };
 
@@ -279,25 +285,12 @@ protected:
 	
 	Alembic::AbcGeom::ICamera m_camera;
 	
-	void updateWithTimeInternal(double time, Imath::M44f& transform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { camera.draw(); }
 
 };
 
 //
-
-template <>
-inline bool ofxAlembic::IGeom::get(ofxAlembic::XForm &o)
-{
-	if (type != ofxAlembic::XFORM)
-	{
-		ofLogError("ofxAlembic::IXform") << "cast error";
-		return false;
-	}
-	
-	o = ((IXform*)this)->xform;
-	return true;
-}
 
 template <>
 inline bool ofxAlembic::IGeom::get(ofMatrix4x4 &o)
@@ -308,7 +301,7 @@ inline bool ofxAlembic::IGeom::get(ofMatrix4x4 &o)
 		return false;
 	}
 	
-	o = ((IXform*)this)->xform.global_matrix;
+	o = transform;
 	return true;
 }
 
@@ -412,6 +405,6 @@ inline bool ofxAlembic::IGeom::get(ofCamera &o)
 		return false;
 	}
 	
-	((ICamera*)this)->camera.updateParams(o);
+	((ICamera*)this)->camera.updateParams(o, transform);
 	return true;
 }
