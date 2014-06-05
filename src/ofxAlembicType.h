@@ -46,6 +46,7 @@ class ofxAlembic::PolyMesh
 {
 public:
 	ofMesh mesh;
+	ofMatrix4x4 matrix;
 
 	PolyMesh() {}
 	PolyMesh(const ofMesh& mesh) : mesh(mesh) {}
@@ -73,7 +74,8 @@ class ofxAlembic::Points
 {
 public:
 	vector<Point> points;
-
+	ofMatrix4x4 matrix;
+	
 	Points() {}
 	Points(const vector<ofVec3f>& points);
 	Points(const vector<Point>& points) : points(points) {}
@@ -88,6 +90,7 @@ class ofxAlembic::Curves
 {
 public:
 	vector<ofPolyline> curves;
+	ofMatrix4x4 matrix;
 
 	Curves() {}
 	Curves(const vector<ofPolyline> &curves) : curves(curves) {}

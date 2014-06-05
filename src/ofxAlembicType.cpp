@@ -51,6 +51,10 @@ void Points::get(OPointsSchema &schema) const
 
 void Points::set(IPointsSchema &schema, float time, const Imath::M44f& transform)
 {
+	matrix = toOf(transform);
+	
+	if (schema.isConstant() && points.size() > 0) return;
+	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	IPointsSchema::Sample sample;
 	schema.get(sample, ss);
@@ -72,12 +76,15 @@ void Points::set(IPointsSchema &schema, float time, const Imath::M44f& transform
 
 void Points::draw()
 {
+	ofPushMatrix();
+	ofMultMatrix(matrix);
 	glBegin(GL_POINTS);
 	for (int i = 0; i < points.size(); i++)
 	{
 		glVertex3fv(points[i].pos.getPtr());
 	}
 	glEnd();
+	ofPopMatrix();
 }
 
 #pragma mark - PolyMesh
@@ -202,6 +209,10 @@ void PolyMesh::get(OPolyMeshSchema &schema) const
 
 void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& transform)
 {
+	matrix = toOf(transform);
+	
+	if (schema.isConstant() && mesh.getNumVertices() > 0) return;
+
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	IPolyMeshSchema::Sample sample;
 	schema.get(sample, ss);
@@ -278,8 +289,8 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& trans
 
 		for (int i = 0; i < numPoints; i++)
 		{
-			transform.multVecMatrix(points[i], dst);
-			verts.push_back(ofVec3f(dst[0], dst[1], dst[2]));
+			const V3f& v = points[i];
+			verts.push_back(ofVec3f(v.x, v.y, v.z));
 		}
 
 		for (int i = 0; i < m_triangles.size(); i++)
@@ -307,8 +318,8 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& trans
 
 				for (int i = 0; i < norm_ptr->size(); i++)
 				{
-					transform.multDirMatrix(((*norm_ptr)[i]), norm);
-					norms.push_back(toOf(norm));
+					const N3f& v = (*norm_ptr)[i];
+					norms.push_back(ofVec3f(v.x, v.y, v.z));
 				}
 
 				for (int i = 0; i < m_triangles.size(); i++)
@@ -348,7 +359,10 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time, const Imath::M44f& trans
 
 void PolyMesh::draw()
 {
+	ofPushMatrix();
+	ofMultMatrix(matrix);
 	mesh.drawWireframe();
+	ofPopMatrix();
 }
 
 #pragma mark - Curves
@@ -379,6 +393,10 @@ void Curves::get(OCurvesSchema &schema) const
 
 void Curves::set(ICurvesSchema &schema, float time, const Imath::M44f& transform)
 {
+	matrix = toOf(transform);
+	
+	if (schema.isConstant() && curves.size() > 0) return;
+	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	ICurvesSchema::Sample sample;
 	schema.get(sample, ss);
@@ -401,8 +419,8 @@ void Curves::set(ICurvesSchema &schema, float time, const Imath::M44f& transform
 
 		for (int n = 0; n < num; n++)
 		{
-			transform.multVecMatrix(*src, dst);
-			polyline.addVertex(toOf(dst));
+			const V3f& v = *src;
+			polyline.addVertex(ofVec3f(v.x, v.y, v.z));
 			src++;
 		}
 	}
@@ -410,10 +428,13 @@ void Curves::set(ICurvesSchema &schema, float time, const Imath::M44f& transform
 
 void Curves::draw()
 {
+	ofPushMatrix();
+	ofMultMatrix(matrix);
 	for (int i = 0; i < curves.size(); i++)
 	{
 		curves[i].draw();
 	}
+	ofPopMatrix();
 }
 
 

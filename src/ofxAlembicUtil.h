@@ -35,4 +35,21 @@ inline Alembic::AbcGeom::V2f toAbc(const ofVec2f& v)
 	return Alembic::AbcGeom::V2f(v.x, v.y);
 }
 
+inline ofMatrix4x4 toOf(const Imath::M44f& v)
+{
+	return ofMatrix4x4(v[0][0], v[0][1], v[0][2], v[0][3],
+					   v[1][0], v[1][1], v[1][2], v[1][3],
+					   v[2][0], v[2][1], v[2][2], v[2][3],
+					   v[3][0], v[3][1], v[3][2], v[3][3]);
+}
+
+inline Imath::M44f toAbc(const ofMatrix4x4& v)
+{
+	const float *p = v.getPtr();
+	return Imath::M44f(p[0], p[1], p[2], p[3],
+					   p[4], p[5], p[6], p[7],
+					   p[8], p[9], p[10], p[11],
+					   p[12], p[13], p[14], p[15]);
+}
+
 vector<ofVec3f> toOf(const vector<ofxAlembic::Point>& v);
