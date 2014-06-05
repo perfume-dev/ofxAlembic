@@ -29,11 +29,11 @@ ofxAlembic::IXform::~IXform()
 		m_xform.reset();
 }
 
-void ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
+bool ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_xform.getSchema().isConstant()) return;
+	if (inited && m_xform.getSchema().isConstant() && time > 0) return false;
 	inited = true;
-
+	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 
 	M44f mat;
@@ -45,6 +45,8 @@ void ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
 		dst[i] = src[i];
 
 	xform = mat * xform;
+	
+	return true;
 }
 
 #pragma mark - IPoints
@@ -67,12 +69,14 @@ ofxAlembic::IPoints::IPoints(Alembic::AbcGeom::IPoints object) : ofxAlembic::IGe
 	type = POINTS;
 }
 
-void ofxAlembic::IPoints::updateWithTimeInternal(double time, Imath::M44f& xform)
+bool ofxAlembic::IPoints::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_points.getSchema().isConstant()) return;
+	if (inited && m_points.getSchema().isConstant()) return false;
 	inited = true;
 
 	points.set(m_points.getSchema(), time);
+	
+	return true;
 }
 
 #pragma mark - ICurves
@@ -96,12 +100,14 @@ ofxAlembic::ICurves::ICurves(Alembic::AbcGeom::ICurves object) : ofxAlembic::IGe
 	type = CURVES;
 }
 
-void ofxAlembic::ICurves::updateWithTimeInternal(double time, Imath::M44f& xform)
+bool ofxAlembic::ICurves::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_curves.getSchema().isConstant()) return;
+	if (inited && m_curves.getSchema().isConstant()) return false;
 	inited = true;
 
 	curves.set(m_curves.getSchema(), time);
+	
+	return true;
 }
 
 #pragma mark - IPolyMesh
@@ -124,12 +130,14 @@ ofxAlembic::IPolyMesh::IPolyMesh(Alembic::AbcGeom::IPolyMesh object) : ofxAlembi
 	type = POLYMESH;
 }
 
-void ofxAlembic::IPolyMesh::updateWithTimeInternal(double time, Imath::M44f& xform)
+bool ofxAlembic::IPolyMesh::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_polyMesh.getSchema().isConstant()) return;
+	if (inited && m_polyMesh.getSchema().isConstant()) return false;
 	inited = true;
 	
 	polymesh.set(m_polyMesh.getSchema(), time);
+	
+	return true;
 }
 
 #pragma mark - ICamera
@@ -152,13 +160,14 @@ ofxAlembic::ICamera::ICamera(Alembic::AbcGeom::ICamera object) : ofxAlembic::IGe
 	type = CAMERA;
 }
 
-void ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& xform)
+bool ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_camera.getSchema().isConstant()) return;
+	if (inited && m_camera.getSchema().isConstant()) return false;
 	inited = true;
 
 	camera.set(m_camera.getSchema(), time);
 	
+	return true;
 }
 
 #pragma mark - Reader
@@ -499,8 +508,11 @@ string IGeom::getFullName() const
 
 void IGeom::updateWithTime(double time, Imath::M44f& xform)
 {
-	updateWithTimeInternal(time, xform);
-	transform = toOf(xform);
+	if (updateWithTimeInternal(time, xform))
+	{
+		transform = toOf(xform);
+	}
+	
 
 	for (int i = 0; i < m_children.size(); i++)
 	{
