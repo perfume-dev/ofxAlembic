@@ -153,14 +153,18 @@ void ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& trans
 
 #pragma mark - Reader
 
-void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_map)
+void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_name_map, map<string, IGeom*> &object_fullname_map)
 {
 	for (int i = 0; i < obj->m_children.size(); i++)
-		visit_geoms(obj->m_children[i], object_map);
+		visit_geoms(obj->m_children[i], object_name_map, object_fullname_map);
 
 	if (obj->isTypeOf(UNKHOWN)) return;
 
-	object_map[obj->getName()] = obj.get();
+	assert(object_name_map.find(obj->getName()) == object_name_map.end());
+	object_name_map[obj->getName()] = obj.get();
+	
+	assert(object_fullname_map.find(obj->getFullName()) == object_fullname_map.end());
+	object_fullname_map[obj->getFullName()] = obj.get();
 }
 
 bool ofxAlembic::Reader::open(const string& path)
@@ -181,16 +185,28 @@ bool ofxAlembic::Reader::open(const string& path)
 	{
 		object_arr.clear();
 		object_name_arr.clear();
-		object_map.clear();
+		object_fullname_arr.clear();
+		object_name_map.clear();
 
-		ofxAlembic::IGeom::visit_geoms(m_root, object_map);
+		ofxAlembic::IGeom::visit_geoms(m_root, object_name_map, object_fullname_map);
 
-		map<string, IGeom*>::iterator it = object_map.begin();
-		while (it != object_map.end())
 		{
-			object_arr.push_back(it->second);
-			object_name_arr.push_back(it->first);
-			it++;
+			map<string, IGeom*>::iterator it = object_name_map.begin();
+			while (it != object_name_map.end())
+			{
+				object_arr.push_back(it->second);
+				object_name_arr.push_back(it->first);
+				it++;
+			}
+		}
+		
+		{
+			map<string, IGeom*>::iterator it = object_fullname_map.begin();
+			while (it != object_fullname_map.end())
+			{
+				object_fullname_arr.push_back(it->first);
+				it++;
+			}
 		}
 	}
 
@@ -204,7 +220,8 @@ void ofxAlembic::Reader::close()
 {
 	object_arr.clear();
 	object_name_arr.clear();
-	object_map.clear();
+	object_fullname_arr.clear();
+	object_name_map.clear();
 
 	if (m_root)
 		m_root.reset();
@@ -244,7 +261,17 @@ void ofxAlembic::Reader::dumpNames()
 
 	for (int i = 0; i < names.size(); i++)
 	{
-		cout << i << ": " << object_map[names[i]]->getTypeName() << " '" << names[i] << "'" << endl;
+		cout << i << ": " << object_name_map[names[i]]->getTypeName() << " '" << names[i] << "'" << endl;
+	}
+}
+
+void ofxAlembic::Reader::dumpFullnames()
+{
+	const vector<string> &names = getNames();
+	
+	for (int i = 0; i < names.size(); i++)
+	{
+		cout << i << ": " << object_fullname_map[names[i]]->getTypeName() << " '" << names[i] << "'" << endl;
 	}
 }
 
@@ -445,6 +472,11 @@ void IGeom::debugDraw()
 }
 
 string IGeom::getName() const
+{
+	return m_object.getName();
+}
+
+string IGeom::getFullName() const
 {
 	return m_object.getFullName();
 }

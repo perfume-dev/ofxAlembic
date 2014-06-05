@@ -45,6 +45,7 @@ public:
 	void close();
 	
 	void dumpNames();
+	void dumpFullnames();
 
 	void setTime(double time);
 	float getTime() const { return current_time; }
@@ -57,6 +58,7 @@ public:
 
 	inline size_t size() const { return object_arr.size(); }
 	inline const vector<string>& getNames() const { return object_name_arr; }
+	inline const vector<string>& getFullnames() const { return object_fullname_arr; }
 
 	bool get(const string& path, ofMatrix4x4& matrix);
 	bool get(const string& path, ofMesh& mesh);
@@ -74,8 +76,12 @@ public:
 	
 	IGeom* get(const string& path)
 	{
-		if (object_map.find(path) == object_map.end()) return NULL;
-		return object_map[path];
+		if (object_name_map.find(path) != object_name_map.end())
+			return object_name_map[path];
+		if (object_fullname_map.find(path) != object_fullname_map.end())
+			return object_fullname_map[path];
+
+		return NULL;
 	}
 	
 protected:
@@ -84,9 +90,12 @@ protected:
 
 	ofPtr<IGeom> m_root;
 
-	map<string, IGeom*> object_map;
+	map<string, IGeom*> object_name_map;
+	map<string, IGeom*> object_fullname_map;
+	
 	vector<IGeom*> object_arr;
 	vector<string> object_name_arr;
+	vector<string> object_fullname_arr;
 
 	Alembic::AbcGeom::chrono_t m_minTime;
 	Alembic::AbcGeom::chrono_t m_maxTime;
@@ -113,6 +122,7 @@ public:
 
 	size_t getIndex() const { return index; }
 	string getName() const;
+	string getFullName() const;
 	virtual const char* getTypeName() const { return ""; }
 
 	inline bool isTypeOf(Type t) const { return type == t; }
@@ -146,7 +156,7 @@ protected:
 	Alembic::AbcGeom::chrono_t m_minTime;
 	Alembic::AbcGeom::chrono_t m_maxTime;
 
-	static void visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_map);
+	static void visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_name_map, map<string, IGeom*> &object_fullname_map);
 };
 
 class ofxAlembic::IXform : public ofxAlembic::IGeom
@@ -170,7 +180,7 @@ protected:
 		ofPushStyle();
 		
 		stringstream ss;
-		ss << "[" << getIndex() << "]";
+		ss << "[" << getName() << "]";
 		
 		ofSetColor(255);
 		ofDrawBitmapString(ss.str(), xform.global_matrix.getTranslation());
