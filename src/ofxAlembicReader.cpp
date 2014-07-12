@@ -7,19 +7,7 @@ using namespace Alembic::AbcGeom;
 
 ofxAlembic::IXform::IXform(Alembic::AbcGeom::IXform object) : ofxAlembic::IGeom(object), m_xform(object)
 {
-	TimeSamplingPtr iTsmp = m_xform.getSchema().getTimeSampling();
-	if (!m_xform.getSchema().isConstant())
-	{
-		size_t numSamps =  m_xform.getSchema().getNumSamples();
-		if (numSamps > 0)
-		{
-			chrono_t minTime = iTsmp->getSampleTime(0);
-			m_minTime = std::min(m_minTime, minTime);
-			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-			m_maxTime = std::max(m_maxTime, maxTime);
-		}
-	}
-	
+	update_timestamp(m_xform);
 	type = XFORM;
 }
 
@@ -31,9 +19,6 @@ ofxAlembic::IXform::~IXform()
 
 bool ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
 {
-	if (inited && m_xform.getSchema().isConstant() && time > 0) return false;
-	inited = true;
-	
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 
 	M44f mat;
@@ -53,19 +38,7 @@ bool ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
 
 ofxAlembic::IPoints::IPoints(Alembic::AbcGeom::IPoints object) : ofxAlembic::IGeom(object), m_points(object)
 {
-	TimeSamplingPtr iTsmp = m_points.getSchema().getTimeSampling();
-	if (!m_points.getSchema().isConstant())
-	{
-		size_t numSamps =  m_points.getSchema().getNumSamples();
-		if (numSamps > 0)
-		{
-			chrono_t minTime = iTsmp->getSampleTime(0);
-			m_minTime = std::min(m_minTime, minTime);
-			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-			m_maxTime = std::max(m_maxTime, maxTime);
-		}
-	}
-
+	update_timestamp(m_points);
 	type = POINTS;
 }
 
@@ -83,20 +56,7 @@ bool ofxAlembic::IPoints::updateWithTimeInternal(double time, Imath::M44f& xform
 
 ofxAlembic::ICurves::ICurves(Alembic::AbcGeom::ICurves object) : ofxAlembic::IGeom(object), m_curves(object)
 {
-
-	TimeSamplingPtr iTsmp = m_curves.getSchema().getTimeSampling();
-	if (!object.getSchema().isConstant())
-	{
-		size_t numSamps = object.getSchema().getNumSamples();
-		if (numSamps > 0)
-		{
-			chrono_t minTime = iTsmp->getSampleTime(0);
-			m_minTime = std::min(m_minTime, minTime);
-			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-			m_maxTime = std::max(m_maxTime, maxTime);
-		}
-	}
-
+	update_timestamp(m_curves);
 	type = CURVES;
 }
 
@@ -114,19 +74,7 @@ bool ofxAlembic::ICurves::updateWithTimeInternal(double time, Imath::M44f& xform
 
 ofxAlembic::IPolyMesh::IPolyMesh(Alembic::AbcGeom::IPolyMesh object) : ofxAlembic::IGeom(object), m_polyMesh(object)
 {
-	TimeSamplingPtr iTsmp = m_polyMesh.getSchema().getTimeSampling();
-	if (!m_polyMesh.getSchema().isConstant())
-	{
-		size_t numSamps =  m_polyMesh.getSchema().getNumSamples();
-		if (numSamps > 0)
-		{
-			chrono_t minTime = iTsmp->getSampleTime(0);
-			m_minTime = std::min(m_minTime, minTime);
-			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-			m_maxTime = std::max(m_maxTime, maxTime);
-		}
-	}
-
+	update_timestamp(m_polyMesh);
 	type = POLYMESH;
 }
 
@@ -144,19 +92,7 @@ bool ofxAlembic::IPolyMesh::updateWithTimeInternal(double time, Imath::M44f& xfo
 
 ofxAlembic::ICamera::ICamera(Alembic::AbcGeom::ICamera object) : ofxAlembic::IGeom(object), m_camera(object)
 {
-	TimeSamplingPtr iTsmp = m_camera.getSchema().getTimeSampling();
-	if (!m_camera.getSchema().isConstant())
-	{
-		size_t numSamps =  m_camera.getSchema().getNumSamples();
-		if (numSamps > 0)
-		{
-			chrono_t minTime = iTsmp->getSampleTime(0);
-			m_minTime = std::min(m_minTime, minTime);
-			chrono_t maxTime = iTsmp->getSampleTime(numSamps - 1);
-			m_maxTime = std::max(m_maxTime, maxTime);
-		}
-	}
-	
+	update_timestamp(m_camera);
 	type = CAMERA;
 }
 
@@ -171,20 +107,6 @@ bool ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& xform
 }
 
 #pragma mark - Reader
-
-void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_name_map, map<string, IGeom*> &object_fullname_map)
-{
-	for (int i = 0; i < obj->m_children.size(); i++)
-		visit_geoms(obj->m_children[i], object_name_map, object_fullname_map);
-
-	if (obj->isTypeOf(UNKHOWN)) return;
-
-	assert(object_name_map.find(obj->getName()) == object_name_map.end());
-	object_name_map[obj->getName()] = obj.get();
-	
-	assert(object_fullname_map.find(obj->getFullName()) == object_fullname_map.end());
-	object_fullname_map[obj->getFullName()] = obj.get();
-}
 
 bool ofxAlembic::Reader::open(const string& path)
 {
@@ -366,9 +288,9 @@ bool ofxAlembic::Reader::get(size_t idx, ofCamera &camera)
 
 #pragma mark - IGeom
 
-IGeom::IGeom() : m_minTime(0), m_maxTime(0), type(UNKHOWN), inited(false) {}
+IGeom::IGeom() : m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKHOWN), inited(false) {}
 
-IGeom::IGeom(Alembic::AbcGeom::IObject object) : m_object(object), m_minTime(0), m_maxTime(0), type(UNKHOWN)
+IGeom::IGeom(Alembic::AbcGeom::IObject object) : m_object(object), m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKHOWN)
 {
 	type = UNKHOWN;
 	setupWithObject(m_object);
@@ -513,10 +435,38 @@ void IGeom::updateWithTime(double time, Imath::M44f& xform)
 		transform = toOf(xform);
 	}
 	
-
 	for (int i = 0; i < m_children.size(); i++)
 	{
 		Imath::M44f m = xform;
 		m_children[i]->updateWithTime(time, m);
 	}
+}
+
+template <typename T>
+void ofxAlembic::IGeom::update_timestamp(T& object)
+{
+	TimeSamplingPtr iTsmp = object.getSchema().getTimeSampling();
+	if (!object.getSchema().isConstant())
+	{
+		size_t numSamps =  object.getSchema().getNumSamples();
+		if (numSamps > 0)
+		{
+			m_minTime = iTsmp->getSampleTime(0);
+			m_maxTime = iTsmp->getSampleTime(numSamps - 1);
+		}
+	}
+}
+
+void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_name_map, map<string, IGeom*> &object_fullname_map)
+{
+	for (int i = 0; i < obj->m_children.size(); i++)
+		visit_geoms(obj->m_children[i], object_name_map, object_fullname_map);
+	
+	if (obj->isTypeOf(UNKHOWN)) return;
+	
+	assert(object_name_map.find(obj->getName()) == object_name_map.end());
+	object_name_map[obj->getName()] = obj.get();
+	
+	assert(object_fullname_map.find(obj->getFullName()) == object_fullname_map.end());
+	object_fullname_map[obj->getFullName()] = obj.get();
 }

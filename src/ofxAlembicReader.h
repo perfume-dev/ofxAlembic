@@ -163,6 +163,9 @@ protected:
 	Alembic::AbcGeom::chrono_t m_maxTime;
 
 	static void visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &object_name_map, map<string, IGeom*> &object_fullname_map);
+	
+	template <typename T>
+	void update_timestamp(T& object);
 };
 
 class ofxAlembic::IXform : public ofxAlembic::IGeom
