@@ -146,7 +146,6 @@ protected:
 	Type type;
 	
 	size_t index;
-	bool inited;
 	ofMatrix4x4 transform;
 
 	Alembic::AbcGeom::IObject m_object;
@@ -155,7 +154,7 @@ protected:
 	virtual void setupWithObject(Alembic::AbcGeom::IObject);
 	void updateWithTime(double time, Imath::M44f& xform);
 
-	virtual bool updateWithTimeInternal(double time, Imath::M44f& xform) { return false; }
+	virtual void updateWithTimeInternal(double time, Imath::M44f& xform) { return false; }
 	virtual void drawInternal() {}
 	virtual void debugDrawInternal() {}
 
@@ -173,6 +172,7 @@ class ofxAlembic::IXform : public ofxAlembic::IGeom
 public:
 	
 	XForm xform;
+	Imath::M44f mat;
 	
 	IXform(Alembic::AbcGeom::IXform object);
 	~IXform();
@@ -183,7 +183,7 @@ protected:
 	
 	Alembic::AbcGeom::IXform m_xform;
 	
-	bool updateWithTimeInternal(double time, Imath::M44f& xform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void debugDrawInternal()
 	{
 		ofPushStyle();
@@ -219,7 +219,7 @@ protected:
 
 	Alembic::AbcGeom::IPoints m_points;
 
-	bool updateWithTimeInternal(double time, Imath::M44f& xform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { points.draw(); }
 };
 
@@ -242,7 +242,7 @@ protected:
 
 	Alembic::AbcGeom::ICurves m_curves;
 
-	bool updateWithTimeInternal(double time, Imath::M44f& xform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { curves.draw(); }
 };
 
@@ -265,7 +265,7 @@ protected:
 
 	Alembic::AbcGeom::IPolyMesh m_polyMesh;
 
-	bool updateWithTimeInternal(double time, Imath::M44f& xform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { polymesh.draw(); }
 };
 
@@ -288,7 +288,7 @@ protected:
 	
 	Alembic::AbcGeom::ICamera m_camera;
 	
-	bool updateWithTimeInternal(double time, Imath::M44f& xform);
+	void updateWithTimeInternal(double time, Imath::M44f& xform);
 	void drawInternal() { camera.draw(); }
 
 };
