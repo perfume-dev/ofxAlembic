@@ -78,6 +78,22 @@ void testApp::setup()
 					
 					writer.addPolyMesh("/polymesh", mesh);
 				}
+				
+				// mesh with xform
+				{
+					ofMatrix4x4 mat;
+					mat.glRotate(f * 5, 0, 1, 0);
+					writer.addXform("/box", mat);
+					
+					if (f == 0)
+					{
+						// write only first frame
+						
+						ofBoxPrimitive box;
+						box.set(100);
+						writer.addPolyMesh("/box/boxShape", box.getMesh());
+					}
+				}
 			}
 		}
 	}
@@ -132,6 +148,11 @@ void testApp::draw()
 		ofSetColor(0, 0, 255);
 		for (int i = 0; i < curves.size(); i++)
 			curves[i].draw();
+	}
+
+	{
+		ofSetColor(255, 255, 0);
+		abc.get("/box")->draw(); // draw box with xform
 	}
 
 	// or simply, abc.draw();
