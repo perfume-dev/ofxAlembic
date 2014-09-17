@@ -31,7 +31,15 @@ enum Type
 class ofxAlembic::XForm
 {
 public:
+	Imath::M44f mat;
+	
+	XForm() {}
+	XForm(const ofMatrix4x4& matrix);
+	
 	void draw();
+	
+	void get(Alembic::AbcGeom::OXformSchema &schema) const;
+	void set(Alembic::AbcGeom::IXformSchema &schema, float time);
 };
 
 class ofxAlembic::PolyMesh

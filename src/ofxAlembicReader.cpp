@@ -12,19 +12,11 @@ ofxAlembic::IXform::IXform(Alembic::AbcGeom::IXform object) : ofxAlembic::IGeom(
 	
 	if (m_xform.getSchema().isConstant())
 	{
-    	ISampleSelector ss(m_minTime, ISampleSelector::kNearIndex);
-		
-		M44d m = m_xform.getSchema().getValue(ss).getMatrix();
-		double *src = m.getValue();
-		
-		float *dst = mat.getValue();
-		
-		for (int i = 0; i < 16; i++)
-			dst[i] = src[i];
+		xform.set(m_xform.getSchema(), m_minTime);
 	}
 	else
 	{
-		mat.setScale(0);
+		xform.mat.setScale(0);
 	}
 }
 
@@ -39,19 +31,10 @@ void ofxAlembic::IXform::updateWithTimeInternal(double time, Imath::M44f& xform)
 	if (!m_xform.getSchema().isConstant()
 		&& ofInRange(time, m_minTime, m_maxTime))
 	{
-		ISampleSelector ss(time, ISampleSelector::kNearIndex);
-		
-		M44d m = m_xform.getSchema().getValue(ss).getMatrix();
-		double *src = m.getValue();
-		
-		float *dst = mat.getValue();
-		
-		for (int i = 0; i < 16; i++)
-			dst[i] = src[i];
-		
+		this->xform.set(m_xform.getSchema(), time);
 	}
 	
-	xform = mat * xform;
+	xform = this->xform.mat * xform;
 }
 
 #pragma mark - IPoints

@@ -172,7 +172,6 @@ class ofxAlembic::IXform : public ofxAlembic::IGeom
 public:
 	
 	XForm xform;
-	Imath::M44f mat;
 	
 	IXform(Alembic::AbcGeom::IXform object);
 	~IXform();

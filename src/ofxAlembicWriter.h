@@ -10,7 +10,6 @@
 namespace ofxAlembic
 {
 class Writer;
-
 }
 
 class ofxAlembic::Writer
@@ -25,6 +24,7 @@ public:
 	void addPoints(const string& path, const Points& points);
 	void addPolyMesh(const string& path, const PolyMesh& polymesh);
 	void addCurves(const string& path, const Curves& curves);
+	void addXform(const string& path, const XForm& xform);
 
 	void setTime(float time);
 	float getTime() const { return current_time; }

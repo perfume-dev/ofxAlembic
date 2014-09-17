@@ -5,9 +5,50 @@ using namespace Alembic::AbcGeom;
 
 #pragma mark - XForm
 
+XForm::XForm(const ofMatrix4x4& matrix)
+	: mat(toAbc(matrix))
+{
+	
+}
+
 void XForm::draw()
 {
 	ofDrawAxis(10);
+}
+
+void XForm::get(Alembic::AbcGeom::OXformSchema &schema) const
+{
+	XformSample samp;
+	
+	XformOp transop(kTranslateOperation, kTranslateHint);
+    XformOp rotatop(kRotateOperation, kRotateHint);
+    XformOp scaleop(kScaleOperation, kScaleHint);
+	
+	Imath::Vec3<float> rot;
+	Imath::extractEulerZYX<float>(mat, rot);
+	
+	Imath::Vec3<float> scl;
+	Imath::extractScaling<float>(mat, scl);
+
+	samp.addOp(transop, mat.translation());
+	samp.addOp(rotatop, V3d(0.0, 0.0, 1.0), ofRadToDeg(rot.z));
+	samp.addOp(rotatop, V3d(0.0, 1.0, 0.0), ofRadToDeg(rot.y));
+	samp.addOp(rotatop, V3d(1.0, 0.0, 0.0), ofRadToDeg(rot.x));
+	samp.addOp(scaleop, scl);
+	
+	schema.set(samp);
+}
+
+void XForm::set(Alembic::AbcGeom::IXformSchema &schema, float time)
+{
+	ISampleSelector ss(time, ISampleSelector::kNearIndex);
+	
+	const M44d& m = schema.getValue(ss).getMatrix();
+	const double *src = m.getValue();
+	float *dst = mat.getValue();
+	
+	for (int i = 0; i < 16; i++)
+		dst[i] = src[i];
 }
 
 #pragma mark - Points
