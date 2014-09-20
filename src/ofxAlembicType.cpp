@@ -16,26 +16,80 @@ void XForm::draw()
 	ofDrawAxis(10);
 }
 
+// via. https://github.com/satoruhiga/ofxEulerAngles/
+
+inline static ofVec3f toEulerXYZ(const ofMatrix4x4 &m)
+{
+	ofVec3f v;
+	
+	float &thetaX = v.x;
+	float &thetaY = v.y;
+	float &thetaZ = v.z;
+	
+	const float &r00 = m(0, 0);
+	const float &r01 = m(1, 0);
+	const float &r02 = m(2, 0);
+	
+	const float &r10 = m(0, 1);
+	const float &r11 = m(1, 1);
+	const float &r12 = m(2, 1);
+	
+	const float &r20 = m(0, 2);
+	const float &r21 = m(1, 2);
+	const float &r22 = m(2, 2);
+	
+	if (r02 < +1)
+	{
+		if (r02 > -1)
+		{
+			thetaY = asinf(r02);
+			thetaX = atan2f(-r12, r22);
+			thetaZ = atan2f(-r01, r00);
+		}
+		else     // r02 = -1
+		{
+			// Not a unique solution: thetaZ - thetaX = atan2f(r10,r11)
+			thetaY = -PI / 2;
+			thetaX = -atan2f(r10, r11);
+			thetaZ = 0;
+		}
+	}
+	else // r02 = +1
+	{
+		// Not a unique solution: thetaZ + thetaX = atan2f(r10,r11)
+		thetaY = +PI / 2;
+		thetaX = atan2f(r10, r11);
+		thetaZ = 0;
+	}
+	
+	thetaX = ofRadToDeg(thetaX);
+	thetaY = ofRadToDeg(thetaY);
+	thetaZ = ofRadToDeg(thetaZ);
+	
+	return v;
+}
+
 void XForm::get(Alembic::AbcGeom::OXformSchema &schema) const
 {
 	XformSample samp;
 	
 	XformOp transop(kTranslateOperation, kTranslateHint);
-    XformOp rotatop(kRotateOperation, kRotateHint);
-    XformOp scaleop(kScaleOperation, kScaleHint);
-	
-	Imath::Vec3<float> rot;
-	Imath::extractEulerZYX<float>(mat, rot);
-	
-	Imath::Vec3<float> scl;
-	Imath::extractScaling<float>(mat, scl);
+	XformOp rotatop(kRotateOperation, kRotateHint);
+	XformOp scaleop(kScaleOperation, kScaleHint);
 
-	samp.addOp(transop, mat.translation());
-	samp.addOp(rotatop, V3d(0.0, 0.0, 1.0), ofRadToDeg(rot.z));
-	samp.addOp(rotatop, V3d(0.0, 1.0, 0.0), ofRadToDeg(rot.y));
-	samp.addOp(rotatop, V3d(1.0, 0.0, 0.0), ofRadToDeg(rot.x));
-	samp.addOp(scaleop, scl);
+	ofMatrix4x4 m = toOf(mat);
+	ofVec3f t, s;
+	ofQuaternion R, so;
+	m.decompose(t, R, s, so);
 	
+	ofVec3f xyz = toEulerXYZ(R);
+	
+	samp.addOp(transop, toAbc(t));
+	samp.addOp(rotatop, V3d(1.0, 0.0, 0.0), xyz.x);
+	samp.addOp(rotatop, V3d(0.0, 1.0, 0.0), xyz.y);
+	samp.addOp(rotatop, V3d(0.0, 0.0, 1.0), xyz.z);
+	samp.addOp(scaleop, toAbc(s));
+
 	schema.set(samp);
 }
 
