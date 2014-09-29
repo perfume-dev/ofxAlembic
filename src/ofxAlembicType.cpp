@@ -259,24 +259,25 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 	}
 
 	{
-		const V3f *points = m_meshP->get();
-		const int32_t *indices = m_meshIndices->get();
-
-		V3f dst;
-		vector<ofVec3f> verts;
-
-		for (int i = 0; i < numPoints; i++)
-		{
-			const V3f& v = points[i];
-			verts.push_back(ofVec3f(v.x, v.y, v.z));
-		}
+		const V3f* points = m_meshP->get();
+		const int32_t* indices = m_meshIndices->get();
+		vector<ofVec3f>& dst = mesh.getVertices();
+		dst.resize(m_triangles.size() * 3);
+		
+		ofVec3f* dst_ptr = dst.data();
 
 		for (int i = 0; i < m_triangles.size(); i++)
 		{
 			Tri &t = m_triangles[i];
-			mesh.addVertex(verts[indices[t[0]]]);
-			mesh.addVertex(verts[indices[t[1]]]);
-			mesh.addVertex(verts[indices[t[2]]]);
+			
+			const V3f& v0 = points[indices[t[0]]];
+			memmove(dst_ptr++, &v0.x, sizeof(float) * 3);
+			
+			const V3f& v1 = points[indices[t[1]]];
+			memmove(dst_ptr++, &v1.x, sizeof(float) * 3);
+			
+			const V3f& v2 = points[indices[t[2]]];
+			memmove(dst_ptr++, &v2.x, sizeof(float) * 3);
 		}
 	}
 
@@ -291,21 +292,24 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 			else
 			{
 				N3fArraySamplePtr norm_ptr = N.getExpandedValue(ss).getVals();
-				N3f norm;
-				vector<ofVec3f> norms;
-
-				for (int i = 0; i < norm_ptr->size(); i++)
-				{
-					const N3f& v = (*norm_ptr)[i];
-					norms.push_back(ofVec3f(v.x, v.y, v.z));
-				}
+				const N3f* src = norm_ptr->get();
+				vector<ofVec3f>& dst = mesh.getNormals();
+				dst.resize(m_triangles.size() * 3);
+				
+				ofVec3f* dst_ptr = dst.data();
 
 				for (int i = 0; i < m_triangles.size(); i++)
 				{
 					Tri &t = m_triangles[i];
-					mesh.addNormal(norms[t[0]]);
-					mesh.addNormal(norms[t[1]]);
-					mesh.addNormal(norms[t[2]]);
+					
+					const N3f& n0 = src[t[0]];
+					memmove(dst_ptr++, &n0.x, sizeof(float) * 3);
+					
+					const N3f& n1 = src[t[1]];
+					memmove(dst_ptr++, &n1.x, sizeof(float) * 3);
+					
+					const N3f& n2 = src[t[2]];
+					memmove(dst_ptr++, &n2.x, sizeof(float) * 3);
 				}
 			}
 		}
@@ -322,13 +326,24 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 			else
 			{
 				V2fArraySamplePtr uv_ptr = UV.getExpandedValue(ss).getVals();
+				const V2f* src = uv_ptr->get();
+				vector<ofVec2f>& dst = mesh.getTexCoords();
+				dst.resize(m_triangles.size() * 3);
+				
+				ofVec2f* dst_ptr = dst.data();
 
 				for (int i = 0; i < m_triangles.size(); i++)
 				{
 					Tri &t = m_triangles[i];
-					mesh.addTexCoord(toOf((*uv_ptr)[t[0]]));
-					mesh.addTexCoord(toOf((*uv_ptr)[t[1]]));
-					mesh.addTexCoord(toOf((*uv_ptr)[t[2]]));
+					
+					const V2f& t0 = src[t[0]];
+					memmove(dst_ptr++, &t0.x, sizeof(float) * 2);
+					
+					const V2f& t1 = src[t[1]];
+					memmove(dst_ptr++, &t1.x, sizeof(float) * 2);
+					
+					const V2f& t2 = src[t[2]];
+					memmove(dst_ptr++, &t2.x, sizeof(float) * 2);
 				}
 			}
 		}
