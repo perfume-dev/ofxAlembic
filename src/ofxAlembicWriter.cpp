@@ -37,7 +37,6 @@ void Writer::addPoints(const string& path, const Points& points)
 {
 	typedef OPoints Type;
 	typedef Type::schema_type Schema;
-	typedef Schema::Sample Sample;
 
 	Type &object = getObject<Type>(path);
 	Schema &schema = object.getSchema();
@@ -49,7 +48,6 @@ void Writer::addPolyMesh(const string& path, const PolyMesh& polymesh)
 {
 	typedef OPolyMesh Type;
 	typedef Type::schema_type Schema;
-	typedef Schema::Sample Sample;
 
 	Type &object = getObject<Type>(path);
 	Schema &schema = object.getSchema();
@@ -61,12 +59,22 @@ void Writer::addCurves(const string& path, const Curves& curves)
 {
 	typedef OCurves Type;
 	typedef Type::schema_type Schema;
-	typedef Schema::Sample Sample;
 
 	Type &object = getObject<Type>(path);
 	Schema &schema = object.getSchema();
 
 	curves.get(schema);
+}
+
+void Writer::addXform(const string& path, const XForm& xform)
+{
+	typedef OXform Type;
+	typedef Type::schema_type Schema;
+	
+	Type &object = getObject<Type>(path);
+	Schema &schema = object.getSchema();
+	
+	xform.get(schema);
 }
 
 // time

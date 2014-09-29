@@ -5,9 +5,104 @@ using namespace Alembic::AbcGeom;
 
 #pragma mark - XForm
 
+XForm::XForm(const ofMatrix4x4& matrix)
+	: mat(toAbc(matrix))
+{
+	
+}
+
 void XForm::draw()
 {
 	ofDrawAxis(10);
+}
+
+// via. https://github.com/satoruhiga/ofxEulerAngles/
+
+inline static ofVec3f toEulerXYZ(const ofMatrix4x4 &m)
+{
+	ofVec3f v;
+	
+	float &thetaX = v.x;
+	float &thetaY = v.y;
+	float &thetaZ = v.z;
+	
+	const float &r00 = m(0, 0);
+	const float &r01 = m(1, 0);
+	const float &r02 = m(2, 0);
+	
+	const float &r10 = m(0, 1);
+	const float &r11 = m(1, 1);
+	const float &r12 = m(2, 1);
+	
+	const float &r20 = m(0, 2);
+	const float &r21 = m(1, 2);
+	const float &r22 = m(2, 2);
+	
+	if (r02 < +1)
+	{
+		if (r02 > -1)
+		{
+			thetaY = asinf(r02);
+			thetaX = atan2f(-r12, r22);
+			thetaZ = atan2f(-r01, r00);
+		}
+		else     // r02 = -1
+		{
+			// Not a unique solution: thetaZ - thetaX = atan2f(r10,r11)
+			thetaY = -PI / 2;
+			thetaX = -atan2f(r10, r11);
+			thetaZ = 0;
+		}
+	}
+	else // r02 = +1
+	{
+		// Not a unique solution: thetaZ + thetaX = atan2f(r10,r11)
+		thetaY = +PI / 2;
+		thetaX = atan2f(r10, r11);
+		thetaZ = 0;
+	}
+	
+	thetaX = ofRadToDeg(thetaX);
+	thetaY = ofRadToDeg(thetaY);
+	thetaZ = ofRadToDeg(thetaZ);
+	
+	return v;
+}
+
+void XForm::get(Alembic::AbcGeom::OXformSchema &schema) const
+{
+	XformSample samp;
+	
+	XformOp transop(kTranslateOperation, kTranslateHint);
+	XformOp rotatop(kRotateOperation, kRotateHint);
+	XformOp scaleop(kScaleOperation, kScaleHint);
+
+	ofMatrix4x4 m = toOf(mat);
+	ofVec3f t, s;
+	ofQuaternion R, so;
+	m.decompose(t, R, s, so);
+	
+	ofVec3f xyz = toEulerXYZ(R);
+	
+	samp.addOp(transop, toAbc(t));
+	samp.addOp(rotatop, V3d(1.0, 0.0, 0.0), xyz.x);
+	samp.addOp(rotatop, V3d(0.0, 1.0, 0.0), xyz.y);
+	samp.addOp(rotatop, V3d(0.0, 0.0, 1.0), xyz.z);
+	samp.addOp(scaleop, toAbc(s));
+
+	schema.set(samp);
+}
+
+void XForm::set(Alembic::AbcGeom::IXformSchema &schema, float time)
+{
+	ISampleSelector ss(time, ISampleSelector::kNearIndex);
+	
+	const M44d& m = schema.getValue(ss).getMatrix();
+	const double *src = m.getValue();
+	float *dst = mat.getValue();
+	
+	for (int i = 0; i < 16; i++)
+		dst[i] = src[i];
 }
 
 #pragma mark - Points
@@ -271,13 +366,13 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 			Tri &t = m_triangles[i];
 			
 			const V3f& v0 = points[indices[t[0]]];
-			memmove(dst_ptr++, &v0.x, sizeof(float) * 3);
+			memcpy(dst_ptr++, &v0.x, sizeof(float) * 3);
 			
 			const V3f& v1 = points[indices[t[1]]];
-			memmove(dst_ptr++, &v1.x, sizeof(float) * 3);
+			memcpy(dst_ptr++, &v1.x, sizeof(float) * 3);
 			
 			const V3f& v2 = points[indices[t[2]]];
-			memmove(dst_ptr++, &v2.x, sizeof(float) * 3);
+			memcpy(dst_ptr++, &v2.x, sizeof(float) * 3);
 		}
 	}
 
@@ -303,13 +398,13 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 					Tri &t = m_triangles[i];
 					
 					const N3f& n0 = src[t[0]];
-					memmove(dst_ptr++, &n0.x, sizeof(float) * 3);
+					memcpy(dst_ptr++, &n0.x, sizeof(float) * 3);
 					
 					const N3f& n1 = src[t[1]];
-					memmove(dst_ptr++, &n1.x, sizeof(float) * 3);
+					memcpy(dst_ptr++, &n1.x, sizeof(float) * 3);
 					
 					const N3f& n2 = src[t[2]];
-					memmove(dst_ptr++, &n2.x, sizeof(float) * 3);
+					memcpy(dst_ptr++, &n2.x, sizeof(float) * 3);
 				}
 			}
 		}
@@ -337,13 +432,13 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 					Tri &t = m_triangles[i];
 					
 					const V2f& t0 = src[t[0]];
-					memmove(dst_ptr++, &t0.x, sizeof(float) * 2);
+					memcpy(dst_ptr++, &t0.x, sizeof(float) * 2);
 					
 					const V2f& t1 = src[t[1]];
-					memmove(dst_ptr++, &t1.x, sizeof(float) * 2);
+					memcpy(dst_ptr++, &t1.x, sizeof(float) * 2);
 					
 					const V2f& t2 = src[t[2]];
-					memmove(dst_ptr++, &t2.x, sizeof(float) * 2);
+					memcpy(dst_ptr++, &t2.x, sizeof(float) * 2);
 				}
 			}
 		}

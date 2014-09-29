@@ -10,7 +10,6 @@
 namespace ofxAlembic
 {
 class Writer;
-
 }
 
 class ofxAlembic::Writer
@@ -25,6 +24,7 @@ public:
 	void addPoints(const string& path, const Points& points);
 	void addPolyMesh(const string& path, const PolyMesh& polymesh);
 	void addCurves(const string& path, const Curves& curves);
+	void addXform(const string& path, const XForm& xform);
 
 	void setTime(float time);
 	float getTime() const { return current_time; }
@@ -45,33 +45,55 @@ protected:
 	T& getObject(const string& path)
 	{
 		using namespace Alembic::AbcGeom;
-
-		string p = path;
-		if (p.size() && p[0] == '/')
+		
+		// validation
+		if (path.empty()
+			|| path[0] != '/'
+			|| path[path.size() - 1] == '/')
 		{
-			p = p.substr(1, p.size() - 1);
+			ofLogError("ofxAlembic::Writer") << "invalid path: '" << path << "'";
+			throw;
+		}
+		
+		map<string, OObject*>::iterator it = object_map.find(path);
+		
+		// return if already created
+		if (it != object_map.end())
+			return *(T*)(it->second);
 
-			if (p[0] == '/')
+		vector<string> e = ofSplitString(path, "/", true, true);
+		string new_object_name = e.back();
+		
+		TimeSampling Ts(inv_fps, current_time);
+		Alembic::Util::uint32_t tsidx = archive.addTimeSampling(Ts);
+		
+		if (e.size() > 1)
+		{
+			// root object
+			string parent_path = "/" + ofJoinString(vector<string>(e.begin(), e.end() - 1), "/");
+			
+			map<string, OObject*>::iterator parent_it = object_map.find(parent_path);
+			if (parent_it == object_map.end())
 			{
-				ofLogError("ofxAlembic::Writer") << "invalid path: '" << path << "'";
+				ofLogError("ofxAlembic::Writer") << "parent object not found: '" << path << "'";
 				throw;
 			}
-		}
-
-		map<string, OObject*>::iterator it = object_map.find(p);
-
-		if (it == object_map.end())
-		{
-			TimeSampling Ts(inv_fps, current_time);
-			Alembic::Util::uint32_t tsidx = archive.addTimeSampling(Ts);
-
-			T *t = new T(archive.getTop(), p);
-			object_map[p] = t;
-
+			
+			OObject* parent_object = parent_it->second;
+			
+			T *t = new T(*parent_object, new_object_name);
 			t->getSchema().setTimeSampling(tsidx);
+			object_map[path] = t;
+			
+			return *t;
 		}
-
-		return *((T*)object_map[p]);
+		else
+		{
+			T *t = new T(archive.getTop(), new_object_name);
+			t->getSchema().setTimeSampling(tsidx);
+			object_map[path] = t;
+			
+			return *t;
+		}
 	}
-
 };
