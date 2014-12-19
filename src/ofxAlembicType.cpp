@@ -545,12 +545,15 @@ void Camera::updateSample(const ofCamera &camera)
 	const double aspect = (width == 0 || height == 0) ?
 				((double) ofGetViewportHeight()) / ofGetViewportWidth() :
 				((double) height) / width;
-	const double horizontalAperture = 3.6; // TODO
+	const double horizontalAperture = 3.6; // Sensor size in cm
+	
 	sample.setHorizontalAperture(horizontalAperture);
 	sample.setVerticalAperture(horizontalAperture * aspect);
+	
 	float fovDeg = camera.getFov();
 	double focalCm = sample.getVerticalAperture() * 0.5 / tan(ofDegToRad(fovDeg) * 0.5);
 	double focalMm = focalCm * 10.0;
+	
 	sample.setFocalLength(focalMm);
 }
 

@@ -26,7 +26,7 @@ public:
 	void addCurves(const string& path, const Curves& curves);
 	void addXform(const string& path, const XForm& xform);
 	void addCamera(const string& path, const Camera& camera);
-	void addOfCamera(const string& path, const ofCamera& camera);
+	void addCamera(const string& path, const ofCamera& camera);
 
 	void setTime(float time);
 	float getTime() const { return current_time; }

@@ -104,7 +104,7 @@ void testApp::setup()
 					outcam.end();
 					
 					// implicitly add xform node
-					writer.addOfCamera("/of_camera", outcam);
+					writer.addCamera("/of_camera", outcam);
 				}
 			}
 		}
@@ -130,7 +130,7 @@ void testApp::update()
 //--------------------------------------------------------------
 void testApp::draw()
 {
-	abc.get("/of_camera/camera_self", cam);
+	abc.get("/of_camera/cameraShape", cam);
 	
 	cam.begin();
 

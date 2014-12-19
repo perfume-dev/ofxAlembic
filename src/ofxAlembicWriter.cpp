@@ -88,13 +88,13 @@ void Writer::addCamera(const string& path, const Camera& camera)
 	camera.get(schema);
 }
 
-void Writer::addOfCamera(const string& path, const ofCamera& ofcamera)
+void Writer::addCamera(const string& path, const ofCamera& ofcamera)
 {
 	addXform(path, ofcamera.getGlobalTransformMatrix());
 	
 	Camera camera(ofcamera);
 	camera.updateSample(ofcamera);
-	addCamera(path + "/camera_self", camera);
+	addCamera(path + "/cameraShape", camera);
 }
 
 // time
