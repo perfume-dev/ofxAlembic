@@ -16,6 +16,7 @@ void testApp::setup()
 	string path = "sample.abc";
 	
 	{
+		ofCamera outcam;
 		ofxAlembic::Writer writer;
 		
 		if (writer.open(path, 30)) // export at 30fps
@@ -94,6 +95,17 @@ void testApp::setup()
 						writer.addPolyMesh("/box/boxShape", box.getMesh());
 					}
 				}
+				
+				// camera
+				{
+					outcam.setFov(20 + f * 0.5);
+					outcam.orbit(f, 50.0, 600.0 + 600.0 * ofNoise(f / 60.0 + 10.0));
+					outcam.begin();
+					outcam.end();
+					
+					// implicitly add xform node
+					writer.addOfCamera("/of_camera", outcam);
+				}
 			}
 		}
 	}
@@ -118,6 +130,8 @@ void testApp::update()
 //--------------------------------------------------------------
 void testApp::draw()
 {
+	abc.get("/of_camera/camera_self", cam);
+	
 	cam.begin();
 
 	glPointSize(4);

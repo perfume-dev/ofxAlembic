@@ -111,6 +111,7 @@ public:
 	void setViewport(int width, int height) { this->width = width, this->height = height; }
 	
 	void updateParams(ofCamera &camera, ofMatrix4x4 xform);
+	void updateSample(const ofCamera &camera);
 	
 	void draw();
 	

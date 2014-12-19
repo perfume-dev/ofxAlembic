@@ -527,13 +527,31 @@ void Curves::draw()
 
 void Camera::get(OCameraSchema &schema) const
 {
-	ofLogError("ofxAlembic::Camera") << "not implemented";
+	Alembic::AbcGeom::CameraSample sample;
+	sample.setHorizontalAperture(this->sample.getHorizontalAperture());
+	sample.setVerticalAperture(this->sample.getVerticalAperture());
+	sample.setFocalLength(this->sample.getFocalLength());
+	schema.set(sample);
 }
 
 void Camera::set(ICameraSchema &schema, float time)
 {
 	ISampleSelector ss(time, ISampleSelector::kNearIndex);
 	schema.get(sample, ss);
+}
+
+void Camera::updateSample(const ofCamera &camera)
+{
+	const double aspect = (width == 0 || height == 0) ?
+				((double) ofGetViewportHeight()) / ofGetViewportWidth() :
+				((double) height) / width;
+	const double horizontalAperture = 3.6; // TODO
+	sample.setHorizontalAperture(horizontalAperture);
+	sample.setVerticalAperture(horizontalAperture * aspect);
+	float fovDeg = camera.getFov();
+	double focalCm = sample.getVerticalAperture() * 0.5 / tan(ofDegToRad(fovDeg) * 0.5);
+	double focalMm = focalCm * 10.0;
+	sample.setFocalLength(focalMm);
 }
 
 void Camera::updateParams(ofCamera &camera, ofMatrix4x4 xform)

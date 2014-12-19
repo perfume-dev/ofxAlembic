@@ -77,6 +77,26 @@ void Writer::addXform(const string& path, const XForm& xform)
 	xform.get(schema);
 }
 
+void Writer::addCamera(const string& path, const Camera& camera)
+{
+	typedef OCamera Type;
+	typedef Type::schema_type Schema;
+	
+	Type &object = getObject<Type>(path);
+	Schema &schema = object.getSchema();
+	
+	camera.get(schema);
+}
+
+void Writer::addOfCamera(const string& path, const ofCamera& ofcamera)
+{
+	addXform(path, ofcamera.getGlobalTransformMatrix());
+	
+	Camera camera(ofcamera);
+	camera.updateSample(ofcamera);
+	addCamera(path + "/camera_self", camera);
+}
+
 // time
 
 void Writer::setTime(float time)
