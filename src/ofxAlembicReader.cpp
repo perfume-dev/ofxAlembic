@@ -215,7 +215,7 @@ void ofxAlembic::Reader::dumpNames()
 
 void ofxAlembic::Reader::dumpFullnames()
 {
-	const vector<string> &names = getNames();
+	const vector<string> &names = getFullnames();
 	
 	for (int i = 0; i < names.size(); i++)
 	{
@@ -468,9 +468,9 @@ void ofxAlembic::IGeom::visit_geoms(ofPtr<IGeom> &obj, map<string, IGeom*> &obje
 	
 	if (obj->isTypeOf(UNKHOWN)) return;
 	
-	assert(object_name_map.find(obj->getName()) == object_name_map.end());
+//	assert(object_name_map.find(obj->getName()) == object_name_map.end());
 	object_name_map[obj->getName()] = obj.get();
 	
-	assert(object_fullname_map.find(obj->getFullName()) == object_fullname_map.end());
+//	assert(object_fullname_map.find(obj->getFullName()) == object_fullname_map.end());
 	object_fullname_map[obj->getFullName()] = obj.get();
 }
