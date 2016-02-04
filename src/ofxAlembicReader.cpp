@@ -125,8 +125,13 @@ bool ofxAlembic::Reader::open(const string& path)
 		return false;
 	}
 
-	m_archive = IArchive(Alembic::AbcCoreHDF5::ReadArchive(), ofToDataPath(path));
-	if (!m_archive.valid()) return false;
+	m_archive = IArchive(Alembic::AbcCoreHDF5::ReadArchive(), ofToDataPath(path),
+                         Alembic::Abc::ErrorHandler::kQuietNoopPolicy);
+    if (!m_archive.valid()) {
+        m_archive = IArchive(Alembic::AbcCoreOgawa::ReadArchive(), ofToDataPath(path),
+                             Alembic::Abc::ErrorHandler::kNoisyNoopPolicy);
+        if (!m_archive.valid()) return false;
+    }
 
 	m_root = ofPtr<IGeom>(new IGeom(m_archive.getTop()));
 
