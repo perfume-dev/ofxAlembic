@@ -100,7 +100,7 @@ typedef enum H5F_mem_t	H5FD_mem_t;
     H5FD_MEM_SUPER,			/*super*/			      \
     H5FD_MEM_SUPER,			/*btree*/			      \
     H5FD_MEM_DRAW,			/*draw*/			      \
-    H5FD_MEM_DRAW,			/*gheap*/			      \
+    H5FD_MEM_SUPER,			/*gheap*/			      \
     H5FD_MEM_SUPER,			/*lheap*/			      \
     H5FD_MEM_SUPER			/*ohdr*/			      \
 }
@@ -267,7 +267,7 @@ typedef enum {
     H5FD_FILE_IMAGE_OP_PROPERTY_LIST_CLOSE,
     H5FD_FILE_IMAGE_OP_FILE_OPEN,
     H5FD_FILE_IMAGE_OP_FILE_RESIZE,
-    H5FD_FILE_IMAGE_OP_FILE_CLOSE
+    H5FD_FILE_IMAGE_OP_FILE_CLOSE,
 } H5FD_file_image_op_t;
 
 /* Define structure to hold file image callbacks */

@@ -37,6 +37,7 @@
 #ifndef _Alembic_AbcCoreAbstract_ScalarSample_h_
 #define _Alembic_AbcCoreAbstract_ScalarSample_h_
 
+#include <Alembic/Util/Export.h>
 #include <Alembic/AbcCoreAbstract/Foundation.h>
 #include <Alembic/AbcCoreAbstract/DataType.h>
 
@@ -58,7 +59,7 @@ namespace ALEMBIC_VERSION_NS {
 //! Plus - and this is just a hunch - I suspect that as Alembic evolves,
 //! there will be a need for this extra bit of encapsulation at the abstract
 //! level, which is why I'm putting it here.
-class ScalarSample
+class ALEMBIC_EXPORT ScalarSample
     : public Alembic::Util::totally_ordered<ScalarSample>
 {
 public:
@@ -78,7 +79,7 @@ public:
         virtual bool lessThan( const void *iData ) const = 0;
         virtual const void *getData() const = 0;
     };
-    
+
     //! Construct from given data type and data. Data will be
     //! copied. If given data is NULL, internal data will be
     //! set to default value.
@@ -108,7 +109,7 @@ public:
     //-*************************************************************************
     // Comparison and Equality
     //-*************************************************************************
-    
+
     //! Assuming the passed memory address points to data of the
     //! same type as us, are they equal? An element-by-element
     //! comparison is done.
@@ -181,7 +182,7 @@ public:
 
 private:
     DataType m_dataType;
-    Alembic::Util::auto_ptr<Data> m_data;
+    Alembic::Util::unique_ptr<Data> m_data;
 };
 
 } // End namespace ALEMBIC_VERSION_NS
