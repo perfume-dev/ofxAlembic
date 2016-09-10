@@ -1,6 +1,6 @@
 //-*****************************************************************************
 //
-// Copyright (c) 2009-2013,
+// Copyright (c) 2009-2014,
 //  Sony Pictures Imageworks, Inc. and
 //  Industrial Light & Magic, a division of Lucasfilm Entertainment Company Ltd.
 //
@@ -38,6 +38,7 @@
 #define _Alembic_AbcGeom_OSubD_h_
 
 #include <map>
+#include <Alembic/Util/Export.h>
 #include <Alembic/AbcGeom/Foundation.h>
 #include <Alembic/AbcGeom/SchemaInfoDeclarations.h>
 #include <Alembic/AbcGeom/OFaceSet.h>
@@ -50,10 +51,11 @@ namespace ALEMBIC_VERSION_NS {
 
 //-*****************************************************************************
 // for default values for int scalar properties here
-static const int32_t ABC_GEOM_SUBD_NULL_INT_VALUE( INT_MIN / 2 );
+static ALEMBIC_EXPORT_CONST 
+int32_t ABC_GEOM_SUBD_NULL_INT_VALUE( INT_MIN / 2 );
 
 //-*****************************************************************************
-class OSubDSchema : public OGeomBaseSchema<SubDSchemaInfo>
+class ALEMBIC_EXPORT OSubDSchema : public OGeomBaseSchema<SubDSchemaInfo>
 {
 public:
     //-*************************************************************************
@@ -190,7 +192,7 @@ public:
         const Abc::Int32ArraySample &getHoles() const
         { return m_holes; }
         void setHoles( const Abc::Int32ArraySample &iHoles )
-        { m_cornerIndices = iHoles; }
+        { m_holes = iHoles; }
 
         // subdivision scheme
         std::string getSubdivisionScheme() const
