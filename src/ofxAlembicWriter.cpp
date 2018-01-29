@@ -3,11 +3,14 @@
 using namespace ofxAlembic;
 using namespace Alembic::AbcGeom;
 
-bool Writer::open(const string& path, float fps)
+bool Writer::open(const string& path, float fps, Alembic::AbcCoreFactory::IFactory::CoreType type)
 {
 	ofxAlembic::init();
-	
-	archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), ofToDataPath(path));
+    if ( type == Alembic::AbcCoreFactory::IFactory::kOgawa) {
+        archive = OArchive(Alembic::AbcCoreOgawa::WriteArchive(), ofToDataPath(path));
+    } else if ( type == Alembic::AbcCoreFactory::IFactory::kHDF5 ) {
+        archive = OArchive(Alembic::AbcCoreHDF5::WriteArchive(), ofToDataPath(path));
+    }
 	if (!archive.valid()) return false;
 
 	archive.setCompressionHint(1);

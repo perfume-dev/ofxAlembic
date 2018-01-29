@@ -5,7 +5,9 @@
 #include "ofxAlembicType.h"
 
 #include <Alembic/AbcGeom/All.h>
+#include <Alembic/AbcCoreFactory/All.h>
 #include <Alembic/AbcCoreHDF5/All.h>
+#include <Alembic/AbcCoreOgawa/All.h>
 
 namespace ofxAlembic
 {
@@ -18,7 +20,7 @@ public:
 
 	~Writer() { close(); }
 
-	bool open(const string& path, float fps = 30);
+    bool open(const string& path, float fps = 30, Alembic::AbcCoreFactory::IFactory::CoreType type = Alembic::AbcCoreFactory::IFactory::kHDF5);
 	void close();
 
 	void addPoints(const string& path, const Points& points);
