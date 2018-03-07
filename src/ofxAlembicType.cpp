@@ -297,7 +297,7 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 	mesh.clear();
 
 	size_t numFaces = m_meshCounts->size();
-	size_t numIndices = m_meshIndices->size();
+    size_t numIndices = m_meshIndices->size();
 	size_t numPoints = m_meshP->size();
 	if (numFaces < 1 ||
 		numIndices < 1 ||
@@ -360,7 +360,7 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 		dst.resize(m_triangles.size() * 3);
 		
 		ofVec3f* dst_ptr = dst.data();
-
+        
 		for (int i = 0; i < m_triangles.size(); i++)
 		{
 			Tri &t = m_triangles[i];
@@ -411,12 +411,33 @@ void PolyMesh::set(IPolyMeshSchema &schema, float time)
 	}
 
 	{
-		IV2fGeomParam UV = schema.getUVsParam();
+        IV2fGeomParam UV = schema.getUVsParam();
 		if (UV.valid())
 		{
 			if (UV.isIndexed())
 			{
-				ofLogError("ofxAlembic::PolyMesh") << "indexed uv is not supported";
+                auto value = UV.getIndexedValue(ss);
+                V2fArraySamplePtr uv_ptr = value.getVals();
+                const V2f* src = uv_ptr->get();
+                auto indices = value.getIndices()->get();
+                vector<ofVec2f>& dst = mesh.getTexCoords();
+                dst.resize(m_triangles.size() * 3);
+                
+                ofVec2f* dst_ptr = dst.data();
+                
+                for (int i = 0; i < m_triangles.size(); i++)
+                {
+                    Tri &t = m_triangles[i];
+                    
+                    const V2f& t0 = src[indices[t[0]]];
+                    memcpy(dst_ptr++, &t0.x, sizeof(float) * 2);
+                    
+                    const V2f& t1 = src[indices[t[1]]];
+                    memcpy(dst_ptr++, &t1.x, sizeof(float) * 2);
+                    
+                    const V2f& t2 = src[indices[t[2]]];
+                    memcpy(dst_ptr++, &t2.x, sizeof(float) * 2);
+                }
 			}
 			else
 			{
