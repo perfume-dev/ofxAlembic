@@ -5,37 +5,7 @@
 ofEasyCam cam;
 ofxAlembic::Reader abc;
 
-class AutoLoadShader : public ofShader
-{
-public:
-	
-	Poco::Timestamp lastFragTimestamp, lastVertTimestamp;
-	ofFile vertShader, fragShader;
-	
-	void watch(string vertName, string fragName)
-	{
-		vertShader.open(vertName);
-		fragShader.open(fragName);
-		
-		ofAddListener(ofEvents().update, this, &AutoLoadShader::onUpdate);
-	}
-	
-	void reload()
-	{
-		load(vertShader.path(), fragShader.path());
-	}
-	
-	void onUpdate(ofEventArgs &e)
-	{
-		if (lastVertTimestamp != vertShader.getPocoFile().getLastModified()
-			|| lastFragTimestamp != fragShader.getPocoFile().getLastModified())
-		{
-			reload();
-		}
-	}
-};
-
-AutoLoadShader shader;
+ofShader shader;
 
 //--------------------------------------------------------------
 void testApp::setup()
@@ -44,11 +14,11 @@ void testApp::setup()
 	ofSetFrameRate(60);
 	ofBackground(0);
 	
-	string path = "perfume_global_site_003_sequence.abc";
+	string path = "alembic_test_ogawa.abc";
 	
 	abc.open(path);
 	
-	shader.watch("shader.vert", "shader.frag");
+	shader.load("shader.vert", "shader.frag");
 }
 
 //--------------------------------------------------------------
@@ -77,16 +47,16 @@ void testApp::draw()
 
     shader.begin();
 
-	for (int i = 0; i < abc.size(); i++)
-	{
-		ofMesh mesh;
-		if (abc.get(i, mesh))
-		{
-			ofSetColor(255);
-			mesh.draw();
-			// mesh.drawWireframe();
-		}
-	}
+    for (int i = 0; i < abc.size(); i++)
+    {
+        ofMesh mesh;
+        if (abc.get(i, mesh))
+        {
+            ofSetColor(255);
+            mesh.draw();
+            // mesh.drawWireframe();
+        }
+    }
 
     shader.end();
 

@@ -25,11 +25,11 @@ void testApp::setup()
 			{
 				// points
 				{
-					vector<ofVec3f> points;
+                    vector<glm::vec3> points;
 					
 					for (int i = 0; i < 10; i++)
 					{
-						ofVec3f p;
+                        glm::vec3 p;
 						p.x = ofRandom(-300, 300);
 						p.y = ofRandom(-300, 300);
 						p.z = ofRandom(-300, 300);
@@ -84,7 +84,7 @@ void testApp::setup()
 				{
 					ofMatrix4x4 mat;
 					mat.glRotate(f * 5, 0, 1, 0);
-					writer.addXform("/box", mat);
+					writer.addXform("/box", toGlm(mat));
 					
 					if (f == 0)
 					{
@@ -145,13 +145,13 @@ void testApp::draw()
 	}
 
 	{
-		vector<ofVec3f> points;
+        vector<glm::vec3> points;
 		abc.get("/points", points);
 		
 		ofSetColor(0, 255, 0);
 		glBegin(GL_POINTS);
 		for (int i = 0; i < points.size(); i++)
-			glVertex3fv(points[i].getPtr());
+			glVertex3fv(&points[i].x);
 		glEnd();
 	}
 

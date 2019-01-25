@@ -54,13 +54,13 @@ void testApp::draw()
 	}
 
 	{
-		vector<ofVec3f> points;
+        std::vector<glm::vec3> points;
 		abc.get("/Emitter/EmitterCloud", points);
 		
 		ofSetColor(0, 255, 0);
 		glBegin(GL_POINTS);
 		for (int i = 0; i < points.size(); i++)
-			glVertex3fv(points[i].getPtr());
+			glVertex3fv(&points[i].x);
 		glEnd();
 	}
 

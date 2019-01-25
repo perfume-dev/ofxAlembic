@@ -64,7 +64,7 @@ public:
 	bool get(const string& path, ofMatrix4x4& matrix);
 	bool get(const string& path, ofMesh& mesh);
 	bool get(const string& path, vector<ofPolyline>& curves);
-	bool get(const string& path, vector<ofVec3f>& points);
+	bool get(const string& path, vector<glm::vec3>& points);
 	bool get(const string& path, ofCamera &camera);
 
 	bool get(size_t idx, ofMatrix4x4& matrix);
@@ -155,7 +155,7 @@ protected:
 	virtual void setupWithObject(Alembic::AbcGeom::IObject);
 	void updateWithTime(double time, Imath::M44f& xform);
 
-	virtual void updateWithTimeInternal(double time, Imath::M44f& xform) { return false; }
+	virtual void updateWithTimeInternal(double time, Imath::M44f& xform) {}
 	virtual void drawInternal() {}
 	virtual void debugDrawInternal() {}
 
@@ -335,7 +335,7 @@ inline bool ofxAlembic::IGeom::get(vector<ofxAlembic::Point> &o)
 }
 
 template <>
-inline bool ofxAlembic::IGeom::get(vector<ofVec3f> &o)
+inline bool ofxAlembic::IGeom::get(std::vector<glm::vec3> &o)
 {
 	if (type != ofxAlembic::POINTS)
 	{
