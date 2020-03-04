@@ -249,7 +249,7 @@ bool ofxAlembic::Reader::get(const string& path, vector<ofPolyline>& curves)
 	return o->get(curves);
 }
 
-bool ofxAlembic::Reader::get(const string& path, vector<ofVec3f>& points)
+bool ofxAlembic::Reader::get(const string& path, vector<glm::vec3>& points)
 {
 	IGeom *o = get(path);
 	if (o == NULL) return false;
