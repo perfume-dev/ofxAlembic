@@ -13,7 +13,7 @@ void testApp::setup()
 	ofSetFrameRate(60);
 	ofBackground(0);
 	
-	string path = "sample.abc";
+	string path = "sample_ogawa.abc";
 	
 	// load allembic file
 	abc.open(path);

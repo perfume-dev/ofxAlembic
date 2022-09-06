@@ -1,6 +1,5 @@
 #include "ofxAlembicUtil.h"
 
-#include "H5public.h"
 
 static bool inited = false;
 
@@ -10,8 +9,6 @@ void ofxAlembic::init()
 	inited = true;
 	
 	ofLogVerbose("ofxAlembic") << "alembic version: " << Alembic::Abc::GetLibraryVersionShort();
-	
-	H5dont_atexit();
 }
 
 void ofxAlembic::transform(ofMesh &mesh, const glm::mat4 &m)
