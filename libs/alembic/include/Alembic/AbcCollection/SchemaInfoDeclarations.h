@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcCollection_SchemaInfoDeclarations_h_
-#define _Alembic_AbcCollection_SchemaInfoDeclarations_h_
+#ifndef Alembic_AbcCollection_SchemaInfoDeclarations_h
+#define Alembic_AbcCollection_SchemaInfoDeclarations_h
 
 #include <Alembic/Abc/OSchema.h>
 
@@ -46,6 +46,7 @@ namespace ALEMBIC_VERSION_NS {
 ALEMBIC_ABC_DECLARE_SCHEMA_INFO( "AbcCollection_Collections_v1",
                                  "",
                                  ".collection",
+                                 false,
                                  CollectionsSchemaInfo );
 
 }

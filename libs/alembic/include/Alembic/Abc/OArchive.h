@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_Abc_OArchive_h_
-#define _Alembic_Abc_OArchive_h_
+#ifndef Alembic_Abc_OArchive_h
+#define Alembic_Abc_OArchive_h
 
 #include <Alembic/Util/Export.h>
 #include <Alembic/Abc/Foundation.h>
@@ -92,12 +92,19 @@ public:
         //! ...
         AbcA::ArchiveWriterPtr iPtr,
 
-        //! Wrap existing. Here cosmetically, for consistency.
-        //! ...
-        WrapExistingFlag /* iWrap */,
-
         //! Optional error handling policy
         //! ...
+        ErrorHandler::Policy iPolicy = ErrorHandler::kThrowPolicy )
+      : m_archive( iPtr )
+    {
+        // Set the error handling policy.
+        getErrorHandler().setPolicy( iPolicy );
+    }
+
+    // Deprecated in favor of the constructor above
+    OArchive(
+        AbcA::ArchiveWriterPtr iPtr,
+        WrapExistingFlag /* iWrap */,
         ErrorHandler::Policy iPolicy = ErrorHandler::kThrowPolicy )
       : m_archive( iPtr )
     {

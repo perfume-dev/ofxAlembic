@@ -30,7 +30,7 @@ common:
 	ADDON_INCLUDES =
 	ADDON_INCLUDES += src
 	ADDON_INCLUDES += libs/alembic/include
-	ADDON_INCLUDES += libs/alembic/include/OpenEXR
+	ADDON_INCLUDES += libs/alembic/include/Imath
 
 
 	# any special flag that should be passed to the compiler when using this
@@ -61,6 +61,15 @@ common:
 	# when parsing the file system looking for libraries exclude this for all or
 	# a specific platform
 	# ADDON_LIBS_EXCLUDE =
+
+vs:
+	ADDON_LIBS =
+	# Release conf
+	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Alembic.lib
+	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Imath-3_2.lib
+
+	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Alembic.dll"
+	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Imath-3_2.dll"
 
 
 

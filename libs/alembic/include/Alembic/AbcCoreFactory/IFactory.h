@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcCoreFactory_IFactory_h_
-#define _Alembic_AbcCoreFactory_IFactory_h_
+#ifndef Alembic_AbcCoreFactory_IFactory_h
+#define Alembic_AbcCoreFactory_IFactory_h
 
 #include <Alembic/AbcCoreAbstract/ReadArraySampleCache.h>
 #include <Alembic/Abc/IArchive.h>
@@ -56,6 +56,7 @@ public:
     {
         kHDF5,
         kOgawa,
+        kLayer,
         kUnknown
     };
 
@@ -68,11 +69,25 @@ public:
     //! file or known type and invalid archive is returned.
     Alembic::Abc::IArchive getArchive( const std::string & iFileName );
 
+    //! Open a series of alembic files, layering each file on top of the next
+    //! to present a single IArchive
+    Alembic::Abc::IArchive getArchive(
+        const std::vector< std::string > & iFileNames );
+
+    //! Try to open and layer a series of files file and return IArchive.
+    //! If all of the files are invalid, an invalid archive is returned.
+    //! If only some of the archives are invalid, only the good ones are
+    //! opened and layered, while invalid ones are ignored.
+    Alembic::Abc::IArchive getArchive(
+        const std::vector< std::string > & iFileNames, CoreType & oType );
+
     //! Use the streams (Alembic does not take ownership) to read the data from
     //! This is currently only valid for Ogawa.  The streams must all reference
     //! the same data.
     Alembic::Abc::IArchive getArchive(
         const std::vector< std::istream * > & iStreams, CoreType & oType );
+
+    // TODO, how do we best layer streams, and strings
 
     //! If opening an HDF5 file, sets whether to use the cached hierarchy
     //! if it exists, the default value is true
@@ -108,6 +123,23 @@ public:
         m_numStreams = iNumStreams;
     }
 
+    enum OgawaReadStrategy
+    {
+        kFileStreams,
+        kMemoryMappedFiles
+    };
+
+    //! Get the I/O strategy used for reading Ogawa files.
+    OgawaReadStrategy getOgawaReadStrategy() { return m_readStrategy; }
+
+    //! Sets the I/O strategy used for reading Ogawa files. The default is
+    //! kMemoryMappedFiles.
+    void setOgawaReadStrategy( OgawaReadStrategy iStrategy )
+    {
+        m_readStrategy = iStrategy;
+    }
+
+
     //! Gets the error handler policy
     Alembic::Abc::ErrorHandler::Policy getPolicy() { return m_policy; }
 
@@ -120,6 +152,7 @@ public:
 private:
     bool m_cacheHierarchy;
     size_t m_numStreams;
+    OgawaReadStrategy m_readStrategy;
     Alembic::AbcCoreAbstract::ReadArraySampleCachePtr m_cachePtr;
     Alembic::Abc::ErrorHandler::Policy m_policy;
 

@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcCoreAbstract_TimeSampling_h_
-#define _Alembic_AbcCoreAbstract_TimeSampling_h_
+#ifndef Alembic_AbcCoreAbstract_TimeSampling_h
+#define Alembic_AbcCoreAbstract_TimeSampling_h
 
 #include <Alembic/Util/Export.h>
 #include <Alembic/AbcCoreAbstract/Foundation.h>
@@ -70,13 +70,14 @@ public:
     //! the specified time per cycle and the specified start time.
     TimeSampling( chrono_t iTimePerCycle, chrono_t iStartTime );
 
-    TimeSampling( const TimeSampling &copy );
-
     TimeSampling();
+
+    TimeSampling( const TimeSampling &copy );
+    TimeSampling & operator=( const TimeSampling &copy );
 
     bool operator==( const TimeSampling & iRhs ) const
     {
-        return (m_timeSamplingType == iRhs.m_timeSamplingType && 
+        return (m_timeSamplingType == iRhs.m_timeSamplingType &&
             m_sampleTimes == iRhs.m_sampleTimes);
     }
 
@@ -114,7 +115,7 @@ public:
     //! than the given time. Invalid to call this with zero samples.
     //! If the maximum sample time is less than iTime, index
     //! numSamples-1 will be returned.
-    std::pair<index_t, chrono_t> getCeilIndex( chrono_t iTime, 
+    std::pair<index_t, chrono_t> getCeilIndex( chrono_t iTime,
         index_t iNumSamples ) const;
 
     //! Find the valid index with the closest time to the given
