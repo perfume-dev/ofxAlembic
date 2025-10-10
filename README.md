@@ -6,6 +6,9 @@ Alembic wrapper addon for OF 0.12.1+.
   - macOS   : Universal (Intel + Apple Sillicon) support, tested on Xcode 15 & 16 (Sonoma & Sequoia)
   - Windows : Windows11 + Visual Studio 2022 (x64 Release Build Only)
 
+### Note
+- Legacy Alembic HDF5 support is completely dropped. Please use Alembic Ogawa file format.
+
 
 ## For Previous OF Releases
 - macOS + OF 0.10.0 - OF 0.11.2 : use [this commit](https://github.com/perfume-dev/ofxAlembic/tree/b29dbd5e5ccc823f585599d6a41734c111bbf88b)
