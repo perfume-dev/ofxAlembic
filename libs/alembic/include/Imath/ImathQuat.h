@@ -41,14 +41,13 @@ IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 template <class T> class IMATH_EXPORT_TEMPLATE_TYPE Quat
 {
-public:
-    using value_type = T;
+  public:
 
     /// @{
     /// @name Direct access to elements
-
+    
     /// The real part
-    T r;
+    T r;       
 
     /// The imaginary vector
     Vec3<T> v;
@@ -57,8 +56,7 @@ public:
 
     /// Element access: q[0] is the real part, (q[1],q[2],q[3]) is the
     /// imaginary part.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T&
-    operator[] (int index) IMATH_NOEXCEPT; // as 4D vector
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 T& operator[] (int index) IMATH_NOEXCEPT; // as 4D vector
 
     /// Element access: q[0] is the real part, (q[1],q[2],q[3]) is the
     /// imaginary part.
@@ -68,14 +66,13 @@ public:
     ///	@name Constructors
 
     /// Default constructor is the identity quat
-    IMATH_HOSTDEVICE constexpr Quat () IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr Quat() IMATH_NOEXCEPT;
 
     /// Copy constructor
     IMATH_HOSTDEVICE constexpr Quat (const Quat& q) IMATH_NOEXCEPT;
 
     /// Construct from a quaternion of a another base type
-    template <class S>
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat (const Quat<S>& q) IMATH_NOEXCEPT;
+    template <class S> IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat (const Quat<S>& q) IMATH_NOEXCEPT;
 
     /// Initialize with real part `s` and imaginary vector 1(i,j,k)`
     IMATH_HOSTDEVICE constexpr Quat (T s, T i, T j, T k) IMATH_NOEXCEPT;
@@ -84,11 +81,10 @@ public:
     IMATH_HOSTDEVICE constexpr Quat (T s, Vec3<T> d) IMATH_NOEXCEPT;
 
     /// The identity quaternion
-    IMATH_HOSTDEVICE constexpr static Quat<T> identity () IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr static Quat<T> identity() IMATH_NOEXCEPT;
 
     /// Assignment
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-    operator= (const Quat<T>& q) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator= (const Quat<T>& q) IMATH_NOEXCEPT;
 
     /// Destructor
     ~Quat () IMATH_NOEXCEPT = default;
@@ -96,140 +92,119 @@ public:
     /// @}
 
     /// @{
-    /// @name Basic Algebra
-    ///
+    /// @name Basic Algebra 
+    ///	
     /// Note that the operator return values are *NOT* normalized
     //
 
     /// Quaternion multiplication
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-    operator*= (const Quat<T>& q) IMATH_NOEXCEPT;
-
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator*= (const Quat<T>& q) IMATH_NOEXCEPT;
+    
     /// Scalar multiplication: multiply both real and imaginary parts
     /// by the given scalar.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-                                             operator*= (T t) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator*= (T t) IMATH_NOEXCEPT;
 
     /// Quaterion division, using the inverse()
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-    operator/= (const Quat<T>& q) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator/= (const Quat<T>& q) IMATH_NOEXCEPT;
 
     /// Scalar division: multiply both real and imaginary parts
     /// by the given scalar.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-                                             operator/= (T t) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator/= (T t) IMATH_NOEXCEPT;
 
     /// Quaternion addition
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-    operator+= (const Quat<T>& q) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator+= (const Quat<T>& q) IMATH_NOEXCEPT;
 
     /// Quaternion subtraction
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>&
-    operator-= (const Quat<T>& q) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 const Quat<T>& operator-= (const Quat<T>& q) IMATH_NOEXCEPT;
 
     /// Equality
-    template <class S>
-    IMATH_HOSTDEVICE constexpr bool
-    operator== (const Quat<S>& q) const IMATH_NOEXCEPT;
+    template <class S> IMATH_HOSTDEVICE constexpr bool operator== (const Quat<S>& q) const IMATH_NOEXCEPT;
 
     /// Inequality
-    template <class S>
-    IMATH_HOSTDEVICE constexpr bool
-    operator!= (const Quat<S>& q) const IMATH_NOEXCEPT;
+    template <class S> IMATH_HOSTDEVICE constexpr bool operator!= (const Quat<S>& q) const IMATH_NOEXCEPT;
 
     /// @}
 
+
     /// @{
     /// @name Query
-
+    
     /// Return the R4 length
-    IMATH_HOSTDEVICE constexpr T length () const IMATH_NOEXCEPT; // in R4
+    IMATH_HOSTDEVICE constexpr T length() const IMATH_NOEXCEPT; // in R4
 
     /// Return the angle of the axis/angle representation
-    IMATH_HOSTDEVICE constexpr T angle () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr T angle() const IMATH_NOEXCEPT;
 
     /// Return the axis of the axis/angle representation
-    IMATH_HOSTDEVICE constexpr Vec3<T> axis () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr Vec3<T> axis() const IMATH_NOEXCEPT;
 
     /// Return a 3x3 rotation matrix
-    IMATH_HOSTDEVICE constexpr Matrix33<T> toMatrix33 () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr Matrix33<T> toMatrix33() const IMATH_NOEXCEPT;
 
     /// Return a 4x4 rotation matrix
-    IMATH_HOSTDEVICE constexpr Matrix44<T> toMatrix44 () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr Matrix44<T> toMatrix44() const IMATH_NOEXCEPT;
 
     /// Return the logarithm of the quaterion
-    IMATH_HOSTDEVICE Quat<T> log () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE Quat<T> log() const IMATH_NOEXCEPT;
 
     /// Return the exponent of the quaterion
-    IMATH_HOSTDEVICE Quat<T> exp () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE Quat<T> exp() const IMATH_NOEXCEPT;
 
     /// @}
 
     /// @{
     /// @name Utility Methods
-
+    
     /// Invert in place: this = 1 / this.
     /// @return const reference to this.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>& invert () IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>& invert() IMATH_NOEXCEPT;
 
     /// Return 1/this, leaving this unchanged.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> inverse () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> inverse() const IMATH_NOEXCEPT;
 
     /// Normalize in place
     /// @return const reference to this.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>& normalize () IMATH_NOEXCEPT;
-
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>& normalize() IMATH_NOEXCEPT;
+    
     /// Return a normalized quaternion, leaving this unmodified.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>
-                                       normalized () const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> normalized() const IMATH_NOEXCEPT;
 
     /// Rotate the given point by the quaterion.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec3<T>
-    rotateVector (const Vec3<T>& original) const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec3<T> rotateVector (const Vec3<T>& original) const IMATH_NOEXCEPT;
 
     /// Return the Euclidean inner product.
-    IMATH_HOSTDEVICE constexpr T
-    euclideanInnerProduct (const Quat<T>& q) const IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE constexpr T euclideanInnerProduct (const Quat<T>& q) const IMATH_NOEXCEPT;
 
     /// Set the quaterion to be a rotation around the given axis by the
     /// given angle.
     /// @return const reference to this.
-    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>&
-    setAxisAngle (const Vec3<T>& axis, T radians) IMATH_NOEXCEPT;
+    IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>& setAxisAngle (const Vec3<T>& axis, T radians) IMATH_NOEXCEPT;
 
     /// Set the quaternion to be a rotation that transforms the
     /// direction vector `fromDirection` to `toDirection`
     /// @return const reference to this.
     IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>&
-    setRotation (const Vec3<T>& fromDirection, const Vec3<T>& toDirection)
-        IMATH_NOEXCEPT;
+    setRotation (const Vec3<T>& fromDirection, const Vec3<T>& toDirection) IMATH_NOEXCEPT;
 
     /// @}
-
+    
     /// The base type: In templates that accept a parameter `V`, you
     /// can refer to `T` as `V::BaseType`
     typedef T BaseType;
 
-private:
-    IMATH_HOSTDEVICE void setRotationInternal (
-        const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q) IMATH_NOEXCEPT;
+  private:
+    IMATH_HOSTDEVICE void setRotationInternal (const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q) IMATH_NOEXCEPT;
 };
 
 template <class T>
-IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>
-slerp (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> slerp (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT;
+
+template <class T>
+IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> slerpShortestArc (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT;
 
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T>
-slerpShortestArc (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT;
-
-template <class T>
-IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> squad (
-    const Quat<T>& q1,
-    const Quat<T>& q2,
-    const Quat<T>& qa,
-    const Quat<T>& qb,
-    T              t) IMATH_NOEXCEPT;
+squad (const Quat<T>& q1, const Quat<T>& q2, const Quat<T>& qa, const Quat<T>& qb, T t) IMATH_NOEXCEPT;
 
 ///
 /// From advanced Animation and Rendering Techniques by Watt and Watt,
@@ -238,51 +213,41 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Quat<T> squad (
 /// computing the inner quadrangle points (qa and qb) to guarantee
 /// tangent continuity.
 template <class T>
-IMATH_HOSTDEVICE void intermediate (
-    const Quat<T>& q0,
-    const Quat<T>& q1,
-    const Quat<T>& q2,
-    const Quat<T>& q3,
-    Quat<T>&       qa,
-    Quat<T>&       qb) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE void intermediate (const Quat<T>& q0,
+                   const Quat<T>& q1,
+                   const Quat<T>& q2,
+                   const Quat<T>& q3,
+                   Quat<T>& qa,
+                   Quat<T>& qb) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Matrix33<T>
-operator* (const Matrix33<T>& M, const Quat<T>& q) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Matrix33<T> operator* (const Matrix33<T>& M, const Quat<T>& q) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Matrix33<T>
-operator* (const Quat<T>& q, const Matrix33<T>& M) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Matrix33<T> operator* (const Quat<T>& q, const Matrix33<T>& M) IMATH_NOEXCEPT;
 
 template <class T> std::ostream& operator<< (std::ostream& o, const Quat<T>& q);
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator* (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator* (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator/ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator/ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator/ (const Quat<T>& q, T t) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator/ (const Quat<T>& q, T t) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator* (const Quat<T>& q, T t) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator* (const Quat<T>& q, T t) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator* (T t, const Quat<T>& q) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator* (T t, const Quat<T>& q) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator+ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator+ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE constexpr Quat<T>
-operator- (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE constexpr Quat<T> operator- (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT;
 
 template <class T>
 IMATH_HOSTDEVICE constexpr Quat<T> operator~ (const Quat<T>& q) IMATH_NOEXCEPT;
@@ -291,8 +256,7 @@ template <class T>
 IMATH_HOSTDEVICE constexpr Quat<T> operator- (const Quat<T>& q) IMATH_NOEXCEPT;
 
 template <class T>
-IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec3<T>
-operator* (const Vec3<T>& v, const Quat<T>& q) IMATH_NOEXCEPT;
+IMATH_HOSTDEVICE IMATH_CONSTEXPR14 Vec3<T> operator* (const Vec3<T>& v, const Quat<T>& q) IMATH_NOEXCEPT;
 
 /// Quaternion of type float
 typedef Quat<float> Quatf;
@@ -305,51 +269,41 @@ typedef Quat<double> Quatd;
 //---------------
 
 template <class T>
-IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat () IMATH_NOEXCEPT : r (1),
-                                                                    v (0, 0, 0)
+IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat() IMATH_NOEXCEPT : r (1), v (0, 0, 0)
 {
     // empty
 }
 
 template <class T>
 template <class S>
-IMATH_HOSTDEVICE
-    IMATH_CONSTEXPR14 inline Quat<T>::Quat (const Quat<S>& q) IMATH_NOEXCEPT
-    : r (q.r),
-      v (q.v)
+IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>::Quat (const Quat<S>& q) IMATH_NOEXCEPT : r (q.r), v (q.v)
 {
     // empty
 }
 
 template <class T>
-IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (T s, T i, T j, T k)
-    IMATH_NOEXCEPT : r (s),
-                     v (i, j, k)
+IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (T s, T i, T j, T k) IMATH_NOEXCEPT : r (s), v (i, j, k)
 {
     // empty
 }
 
 template <class T>
-IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (T s, Vec3<T> d) IMATH_NOEXCEPT
-    : r (s),
-      v (d)
+IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (T s, Vec3<T> d) IMATH_NOEXCEPT : r (s), v (d)
 {
     // empty
 }
 
 template <class T>
-IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (const Quat<T>& q)
-    IMATH_NOEXCEPT : r (q.r),
-                     v (q.v)
+IMATH_HOSTDEVICE constexpr inline Quat<T>::Quat (const Quat<T>& q) IMATH_NOEXCEPT : r (q.r), v (q.v)
 {
     // empty
 }
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline Quat<T>
-Quat<T>::identity () IMATH_NOEXCEPT
+Quat<T>::identity() IMATH_NOEXCEPT
 {
-    return Quat<T> ();
+    return Quat<T>();
 }
 
 template <class T>
@@ -384,7 +338,7 @@ template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline const Quat<T>&
 Quat<T>::operator/= (const Quat<T>& q) IMATH_NOEXCEPT
 {
-    *this = *this * q.inverse ();
+    *this = *this * q.inverse();
     return *this;
 }
 
@@ -455,16 +409,16 @@ operator^ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline T
-Quat<T>::length () const IMATH_NOEXCEPT
+Quat<T>::length() const IMATH_NOEXCEPT
 {
     return std::sqrt (r * r + (v ^ v));
 }
 
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>&
-                 Quat<T>::normalize () IMATH_NOEXCEPT
+Quat<T>::normalize() IMATH_NOEXCEPT
 {
-    if (T l = length ())
+    if (T l = length())
     {
         r /= l;
         v /= l;
@@ -480,16 +434,17 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>&
 
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
-                 Quat<T>::normalized () const IMATH_NOEXCEPT
+Quat<T>::normalized() const IMATH_NOEXCEPT
 {
-    if (T l = length ()) return Quat (r / l, v / l);
+    if (T l = length())
+        return Quat (r / l, v / l);
 
-    return Quat ();
+    return Quat();
 }
 
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
-                 Quat<T>::inverse () const IMATH_NOEXCEPT
+Quat<T>::inverse() const IMATH_NOEXCEPT
 {
     //
     // 1    Q*
@@ -503,7 +458,7 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
 
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>&
-                 Quat<T>::invert () IMATH_NOEXCEPT
+Quat<T>::invert() IMATH_NOEXCEPT
 {
     T qdot = (*this) ^ (*this);
     r /= qdot;
@@ -545,11 +500,11 @@ template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline T
 angle4D (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT
 {
-    Quat<T> d       = q1 - q2;
-    T       lengthD = std::sqrt (d ^ d);
+    Quat<T> d = q1 - q2;
+    T lengthD = std::sqrt (d ^ d);
 
-    Quat<T> s       = q1 + q2;
-    T       lengthS = std::sqrt (s ^ s);
+    Quat<T> s = q1 + q2;
+    T lengthS = std::sqrt (s ^ s);
 
     return 2 * std::atan2 (lengthD, lengthS);
 }
@@ -581,7 +536,7 @@ slerp (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT
     Quat<T> q = sinx_over_x (s * a) / sinx_over_x (a) * s * q1 +
                 sinx_over_x (t * a) / sinx_over_x (a) * t * q2;
 
-    return q.normalized ();
+    return q.normalized();
 }
 
 ///
@@ -618,12 +573,7 @@ slerpShortestArc (const Quat<T>& q1, const Quat<T>& q2, T t) IMATH_NOEXCEPT
 /// qb.
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
-                 spline (
-                     const Quat<T>& q0,
-                     const Quat<T>& q1,
-                     const Quat<T>& q2,
-                     const Quat<T>& q3,
-                     T              t) IMATH_NOEXCEPT
+spline (const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2, const Quat<T>& q3, T t) IMATH_NOEXCEPT
 {
     Quat<T> qa     = intermediate (q0, q1, q2);
     Quat<T> qb     = intermediate (q1, q2, q3);
@@ -641,12 +591,7 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
 /// quaternions.
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
-                 squad (
-                     const Quat<T>& q1,
-                     const Quat<T>& qa,
-                     const Quat<T>& qb,
-                     const Quat<T>& q2,
-                     T              t) IMATH_NOEXCEPT
+squad (const Quat<T>& q1, const Quat<T>& qa, const Quat<T>& qb, const Quat<T>& q2, T t) IMATH_NOEXCEPT
 {
     Quat<T> r1     = slerp (q1, q2, t);
     Quat<T> r2     = slerp (qa, qb, t);
@@ -659,21 +604,20 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
 /// and `q2`.
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>
-intermediate (const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2)
-    IMATH_NOEXCEPT
+intermediate (const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT
 {
-    Quat<T> q1inv = q1.inverse ();
+    Quat<T> q1inv = q1.inverse();
     Quat<T> c1    = q1inv * q2;
     Quat<T> c2    = q1inv * q0;
-    Quat<T> c3    = (T) (-0.25) * (c2.log () + c1.log ());
-    Quat<T> qa    = q1 * c3.exp ();
-    qa.normalize ();
+    Quat<T> c3    = (T) (-0.25) * (c2.log() + c1.log());
+    Quat<T> qa    = q1 * c3.exp();
+    qa.normalize();
     return qa;
 }
 
 template <class T>
 IMATH_HOSTDEVICE inline Quat<T>
-Quat<T>::log () const IMATH_NOEXCEPT
+Quat<T>::log() const IMATH_NOEXCEPT
 {
     //
     // For unit quaternion, from Advanced Animation and
@@ -682,14 +626,13 @@ Quat<T>::log () const IMATH_NOEXCEPT
 
     T theta = std::acos (std::min (r, (T) 1.0));
 
-    if (theta == 0) return Quat<T> (0, v);
+    if (theta == 0)
+        return Quat<T> (0, v);
 
     T sintheta = std::sin (theta);
 
     T k;
-    if (std::abs (sintheta) < 1 &&
-        std::abs (theta) >=
-            std::numeric_limits<T>::max () * std::abs (sintheta))
+    if (std::abs(sintheta) < 1 && std::abs(theta) >= std::numeric_limits<T>::max() * std::abs(sintheta))
         k = 1;
     else
         k = theta / sintheta;
@@ -699,7 +642,7 @@ Quat<T>::log () const IMATH_NOEXCEPT
 
 template <class T>
 IMATH_HOSTDEVICE inline Quat<T>
-Quat<T>::exp () const IMATH_NOEXCEPT
+Quat<T>::exp() const IMATH_NOEXCEPT
 {
     //
     // For pure quaternion (zero scalar part):
@@ -707,12 +650,11 @@ Quat<T>::exp () const IMATH_NOEXCEPT
     // Techniques by Watt and Watt, Page 366:
     //
 
-    T theta    = v.length ();
+    T theta    = v.length();
     T sintheta = std::sin (theta);
 
     T k;
-    if (abs (theta) < 1 &&
-        abs (sintheta) >= std::numeric_limits<T>::max () * abs (theta))
+    if (abs (theta) < 1 && abs (sintheta) >= std::numeric_limits<T>::max() * abs (theta))
         k = 1;
     else
         k = sintheta / theta;
@@ -724,16 +666,16 @@ Quat<T>::exp () const IMATH_NOEXCEPT
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline T
-Quat<T>::angle () const IMATH_NOEXCEPT
+Quat<T>::angle() const IMATH_NOEXCEPT
 {
-    return 2 * std::atan2 (v.length (), r);
+    return 2 * std::atan2 (v.length(), r);
 }
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline Vec3<T>
-Quat<T>::axis () const IMATH_NOEXCEPT
+Quat<T>::axis() const IMATH_NOEXCEPT
 {
-    return v.normalized ();
+    return v.normalized();
 }
 
 template <class T>
@@ -741,7 +683,7 @@ IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Quat<T>&
 Quat<T>::setAxisAngle (const Vec3<T>& axis, T radians) IMATH_NOEXCEPT
 {
     r = std::cos (radians / 2);
-    v = axis.normalized () * std::sin (radians / 2);
+    v = axis.normalized() * std::sin (radians / 2);
     return *this;
 }
 
@@ -765,8 +707,8 @@ Quat<T>::setRotation (const Vec3<T>& from, const Vec3<T>& to) IMATH_NOEXCEPT
     // Normalize from and to, yielding f0 and t0.
     //
 
-    Vec3<T> f0 = from.normalized ();
-    Vec3<T> t0 = to.normalized ();
+    Vec3<T> f0 = from.normalized();
+    Vec3<T> t0 = to.normalized();
 
     if ((f0 ^ t0) >= 0)
     {
@@ -784,7 +726,7 @@ Quat<T>::setRotation (const Vec3<T>& from, const Vec3<T>& to) IMATH_NOEXCEPT
         // from f0 to h0, then from h0 to t0.
         //
 
-        Vec3<T> h0 = (f0 + t0).normalized ();
+        Vec3<T> h0 = (f0 + t0).normalized();
 
         if ((h0 ^ h0) != 0)
         {
@@ -808,11 +750,11 @@ Quat<T>::setRotation (const Vec3<T>& from, const Vec3<T>& to) IMATH_NOEXCEPT
             Vec3<T> f02 = f0 * f0;
 
             if (f02.x <= f02.y && f02.x <= f02.z)
-                v = (f0 % Vec3<T> (1, 0, 0)).normalized ();
+                v = (f0 % Vec3<T> (1, 0, 0)).normalized();
             else if (f02.y <= f02.z)
-                v = (f0 % Vec3<T> (0, 1, 0)).normalized ();
+                v = (f0 % Vec3<T> (0, 1, 0)).normalized();
             else
-                v = (f0 % Vec3<T> (0, 0, 1)).normalized ();
+                v = (f0 % Vec3<T> (0, 0, 1)).normalized();
         }
     }
 
@@ -821,8 +763,7 @@ Quat<T>::setRotation (const Vec3<T>& from, const Vec3<T>& to) IMATH_NOEXCEPT
 
 template <class T>
 IMATH_HOSTDEVICE inline void
-Quat<T>::setRotationInternal (const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q)
-    IMATH_NOEXCEPT
+Quat<T>::setRotationInternal (const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q) IMATH_NOEXCEPT
 {
     //
     // The following is equivalent to setAxisAngle(n,2*phi),
@@ -841,7 +782,7 @@ Quat<T>::setRotationInternal (const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q)
     // The angle between f0 and h0 is phi.
     //
 
-    Vec3<T> h0 = (f0 + t0).normalized ();
+    Vec3<T> h0 = (f0 + t0).normalized();
 
     //
     // Store the rotation axis and rotation angle.
@@ -853,43 +794,41 @@ Quat<T>::setRotationInternal (const Vec3<T>& f0, const Vec3<T>& t0, Quat<T>& q)
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline Matrix33<T>
-Quat<T>::toMatrix33 () const IMATH_NOEXCEPT
+Quat<T>::toMatrix33() const IMATH_NOEXCEPT
 {
-    return Matrix33<T> (
-        1 - 2 * (v.y * v.y + v.z * v.z),
-        2 * (v.x * v.y + v.z * r),
-        2 * (v.z * v.x - v.y * r),
+    return Matrix33<T> (1 - 2 * (v.y * v.y + v.z * v.z),
+                        2 * (v.x * v.y + v.z * r),
+                        2 * (v.z * v.x - v.y * r),
 
-        2 * (v.x * v.y - v.z * r),
-        1 - 2 * (v.z * v.z + v.x * v.x),
-        2 * (v.y * v.z + v.x * r),
+                        2 * (v.x * v.y - v.z * r),
+                        1 - 2 * (v.z * v.z + v.x * v.x),
+                        2 * (v.y * v.z + v.x * r),
 
-        2 * (v.z * v.x + v.y * r),
-        2 * (v.y * v.z - v.x * r),
-        1 - 2 * (v.y * v.y + v.x * v.x));
+                        2 * (v.z * v.x + v.y * r),
+                        2 * (v.y * v.z - v.x * r),
+                        1 - 2 * (v.y * v.y + v.x * v.x));
 }
 
 template <class T>
 IMATH_HOSTDEVICE constexpr inline Matrix44<T>
-Quat<T>::toMatrix44 () const IMATH_NOEXCEPT
+Quat<T>::toMatrix44() const IMATH_NOEXCEPT
 {
-    return Matrix44<T> (
-        1 - 2 * (v.y * v.y + v.z * v.z),
-        2 * (v.x * v.y + v.z * r),
-        2 * (v.z * v.x - v.y * r),
-        0,
-        2 * (v.x * v.y - v.z * r),
-        1 - 2 * (v.z * v.z + v.x * v.x),
-        2 * (v.y * v.z + v.x * r),
-        0,
-        2 * (v.z * v.x + v.y * r),
-        2 * (v.y * v.z - v.x * r),
-        1 - 2 * (v.y * v.y + v.x * v.x),
-        0,
-        0,
-        0,
-        0,
-        1);
+    return Matrix44<T> (1 - 2 * (v.y * v.y + v.z * v.z),
+                        2 * (v.x * v.y + v.z * r),
+                        2 * (v.z * v.x - v.y * r),
+                        0,
+                        2 * (v.x * v.y - v.z * r),
+                        1 - 2 * (v.z * v.z + v.x * v.x),
+                        2 * (v.y * v.z + v.x * r),
+                        0,
+                        2 * (v.z * v.x + v.y * r),
+                        2 * (v.y * v.z - v.x * r),
+                        1 - 2 * (v.y * v.y + v.x * v.x),
+                        0,
+                        0,
+                        0,
+                        0,
+                        1);
 }
 
 /// Transform the quaternion by the matrix
@@ -898,7 +837,7 @@ template <class T>
 IMATH_HOSTDEVICE constexpr inline Matrix33<T>
 operator* (const Matrix33<T>& M, const Quat<T>& q) IMATH_NOEXCEPT
 {
-    return M * q.toMatrix33 ();
+    return M * q.toMatrix33();
 }
 
 /// Transform the matrix by the quaterion:
@@ -907,7 +846,7 @@ template <class T>
 IMATH_HOSTDEVICE constexpr inline Matrix33<T>
 operator* (const Quat<T>& q, const Matrix33<T>& M) IMATH_NOEXCEPT
 {
-    return q.toMatrix33 () * M;
+    return q.toMatrix33() * M;
 }
 
 /// Stream output as "(r x y z)"
@@ -915,8 +854,7 @@ template <class T>
 std::ostream&
 operator<< (std::ostream& o, const Quat<T>& q)
 {
-    return o << "(" << q.r << " " << q.v.x << " " << q.v.y << " " << q.v.z
-             << ")";
+    return o << "(" << q.r << " " << q.v.x << " " << q.v.y << " " << q.v.z << ")";
 }
 
 /// Quaterion multiplication
@@ -924,8 +862,7 @@ template <class T>
 IMATH_HOSTDEVICE constexpr inline Quat<T>
 operator* (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT
 {
-    return Quat<T> (
-        q1.r * q2.r - (q1.v ^ q2.v), q1.r * q2.v + q1.v * q2.r + q1.v % q2.v);
+    return Quat<T> (q1.r * q2.r - (q1.v ^ q2.v), q1.r * q2.v + q1.v * q2.r + q1.v % q2.v);
 }
 
 /// Quaterion division
@@ -933,7 +870,7 @@ template <class T>
 IMATH_HOSTDEVICE constexpr inline Quat<T>
 operator/ (const Quat<T>& q1, const Quat<T>& q2) IMATH_NOEXCEPT
 {
-    return q1 * q2.inverse ();
+    return q1 * q2.inverse();
 }
 
 /// Quaterion division
@@ -998,7 +935,7 @@ operator- (const Quat<T>& q) IMATH_NOEXCEPT
 /// @return v * q
 template <class T>
 IMATH_HOSTDEVICE IMATH_CONSTEXPR14 inline Vec3<T>
-                 operator* (const Vec3<T>& v, const Quat<T>& q) IMATH_NOEXCEPT
+operator* (const Vec3<T>& v, const Quat<T>& q) IMATH_NOEXCEPT
 {
     Vec3<T> a = q.v % v;
     Vec3<T> b = q.v % a;

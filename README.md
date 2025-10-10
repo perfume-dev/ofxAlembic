@@ -1,8 +1,10 @@
 # ofxAlembic
 Alembic wrapper addon for OF 0.12.1+.
 
-- Bump Alembic to 1.8.9
-- Support openFrameworks 0.12.1 on Windows + Visual Studio 2022 (x64 Release Build Only)
+- Bump Alembic to 1.8.9 + Imath 3.1.12
+- Support openFrameworks 0.12.1 on macOS + Windows
+  - macOS   : Universal (Intel + Apple Sillicon) support, tested on Xcode 15 & 16 (Sonoma & Sequoia)
+  - Windows : Windows11 + Visual Studio 2022 (x64 Release Build Only)
 
 
 ## For Previous OF Releases

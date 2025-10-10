@@ -6,8 +6,8 @@
 #ifndef INCLUDED_IMATHFORWARD_H
 #define INCLUDED_IMATHFORWARD_H
 
-#include "ImathExport.h"
 #include "ImathNamespace.h"
+#include "ImathExport.h"
 
 IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 

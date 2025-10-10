@@ -61,7 +61,7 @@ glTexCoord (const IMATH_INTERNAL_NAMESPACE::V2f& t)
 
 /// Disable GL textures
 inline void
-glDisableTexture ()
+glDisableTexture()
 {
     glActiveTexture (GL_TEXTURE1);
     glBindTexture (GL_TEXTURE_2D, 0);
@@ -78,8 +78,7 @@ const float GL_FLOAT_MAX = 1.8e+19; // sqrt (FLT_MAX)
 inline bool
 badFloat (float f)
 {
-    return !IMATH_INTERNAL_NAMESPACE::finitef (f) || f < -GL_FLOAT_MAX ||
-           f > GL_FLOAT_MAX;
+    return !IMATH_INTERNAL_NAMESPACE::finitef (f) || f < -GL_FLOAT_MAX || f > GL_FLOAT_MAX;
 }
 
 } // namespace
@@ -88,12 +87,10 @@ badFloat (float f)
 inline void
 throwBadMatrix (const IMATH_INTERNAL_NAMESPACE::M44f& m)
 {
-    if (badFloat (m[0][0]) || badFloat (m[0][1]) || badFloat (m[0][2]) ||
-        badFloat (m[0][3]) || badFloat (m[1][0]) || badFloat (m[1][1]) ||
-        badFloat (m[1][2]) || badFloat (m[1][3]) || badFloat (m[2][0]) ||
-        badFloat (m[2][1]) || badFloat (m[2][2]) || badFloat (m[2][3]) ||
-        badFloat (m[3][0]) || badFloat (m[3][1]) || badFloat (m[3][2]) ||
-        badFloat (m[3][3]))
+    if (badFloat (m[0][0]) || badFloat (m[0][1]) || badFloat (m[0][2]) || badFloat (m[0][3]) ||
+        badFloat (m[1][0]) || badFloat (m[1][1]) || badFloat (m[1][2]) || badFloat (m[1][3]) ||
+        badFloat (m[2][0]) || badFloat (m[2][1]) || badFloat (m[2][2]) || badFloat (m[2][3]) ||
+        badFloat (m[3][0]) || badFloat (m[3][1]) || badFloat (m[3][2]) || badFloat (m[3][3]))
         throw std::invalid_argument ("GL matrix overflow");
 }
 
@@ -138,9 +135,9 @@ IMATH_INTERNAL_NAMESPACE_HEADER_ENTER
 
 class GLPushMatrix
 {
-public:
-    GLPushMatrix () { glPushMatrix (); }
-    ~GLPushMatrix () { glPopMatrix (); }
+  public:
+    GLPushMatrix() { glPushMatrix(); }
+    ~GLPushMatrix() { glPopMatrix(); }
 };
 
 ///
@@ -150,12 +147,12 @@ public:
 
 class GLPushAttrib
 {
-public:
+  public:
     /// call glPushAttrib()
     GLPushAttrib (GLbitfield mask) { glPushAttrib (mask); }
 
     /// call glPopAttrib()
-    ~GLPushAttrib () { glPopAttrib (); }
+    ~GLPushAttrib() { glPopAttrib(); }
 };
 
 ///
@@ -165,12 +162,13 @@ public:
 
 class GLBegin
 {
-public:
+  public:
+
     /// Call glBegin()
     GLBegin (GLenum mode) { glBegin (mode); }
 
     /// Call glEnd()
-    ~GLBegin () { glEnd (); }
+    ~GLBegin() { glEnd(); }
 };
 
 IMATH_INTERNAL_NAMESPACE_HEADER_EXIT
