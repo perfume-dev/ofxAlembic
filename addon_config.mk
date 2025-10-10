@@ -66,10 +66,10 @@ vs:
 	ADDON_LIBS =
 	# Release conf
 	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Alembic.lib
-	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Imath-3_2.lib
+	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Imath-3_1.lib
 
 	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Alembic.dll"
-	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Imath-3_2.dll"
+	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Imath-3_1.dll"
 
 
 
