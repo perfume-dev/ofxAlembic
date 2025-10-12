@@ -33,37 +33,16 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_Util_Foundation_h_
-#define _Alembic_Util_Foundation_h_
+#ifndef Alembic_Util_Foundation_h
+#define Alembic_Util_Foundation_h
 
 #include <Alembic/Util/Config.h>
 
-#ifdef ALEMBIC_LIB_USES_BOOST
-#include <boost/type_traits.hpp>
-#include <boost/ref.hpp>
-#include <boost/format.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/utility.hpp>
-#include <boost/cstdint.hpp>
-#include <boost/array.hpp>
-#include <boost/operators.hpp>
-#include <boost/foreach.hpp>
-#include <boost/unordered_map.hpp>
-
-// tr1 is not available in older versions of Visual Studio i.e. _MSC_VER <= 1600
-#elif defined(ALEMBIC_LIB_USES_TR1)
-#include <tr1/memory>
-#include <tr1/unordered_map>
-
-// default to C++11
-#else
 #include <unordered_map>
-#endif
 
 #include <memory>
 
-#include <half.h>
+#include <Imath/half.h>
 
 #include <iomanip>
 #include <iostream>
@@ -71,14 +50,15 @@
 #include <exception>
 #include <limits>
 
+#include <list>
 #include <map>
 #include <string>
 #include <vector>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
 #include <Alembic/Util/Export.h>
 
@@ -100,8 +80,12 @@
 // needed for std min/max
 #include <algorithm>
 
+// When we change this version (because of an ABI change) Make sure to at
+// LEAST bump the minor version in CMakeLists.txt i.e. PROJECT_VERSION_MINOR
+// This way we will hopefully not break any distros that kindly include us.
+// See Issue243
 #ifndef ALEMBIC_VERSION_NS
-#define ALEMBIC_VERSION_NS v8
+#define ALEMBIC_VERSION_NS v12
 #endif
 
 namespace Alembic {
@@ -121,23 +105,6 @@ private:
     const noncopyable& operator=( const noncopyable& );
 };
 
-#ifdef ALEMBIC_LIB_USES_BOOST
-using boost::dynamic_pointer_cast;
-using boost::enable_shared_from_this;
-using boost::shared_ptr;
-using boost::static_pointer_cast;
-using boost::weak_ptr;
-using boost::unordered_map;
-
-#elif defined(ALEMBIC_LIB_USES_TR1)
-using std::tr1::dynamic_pointer_cast;
-using std::tr1::enable_shared_from_this;
-using std::tr1::shared_ptr;
-using std::tr1::static_pointer_cast;
-using std::tr1::weak_ptr;
-using std::tr1::unordered_map;
-
-#else
 using std::dynamic_pointer_cast;
 using std::enable_shared_from_this;
 using std::shared_ptr;
@@ -145,52 +112,6 @@ using std::static_pointer_cast;
 using std::weak_ptr;
 using std::unordered_map;
 using std::unique_ptr;
-#endif
-
-#if defined(ALEMBIC_LIB_USES_BOOST) || defined(ALEMBIC_LIB_USES_TR1)
-
-// define a very simple scoped ptr since unique_ptr isn't consistently
-// available on boost versions.  Otherwise we could use boost::scoped_ptr
-// or the deprecated std::auto_ptr for tr1.
-template<typename T>
-class unique_ptr : noncopyable
-{
-public:
-    unique_ptr()
-    {
-        p = NULL;
-    }
-
-    unique_ptr( T* val ) : p(val)
-    {
-    }
-
-    ~unique_ptr()
-    {
-        if ( p )
-        {
-            delete p;
-        }
-    }
-
-    void reset( T* val )
-    {
-        if ( p )
-        {
-            delete p;
-        }
-        p = val;
-    }
-
-    T* operator->() const
-    {
-        return p;
-    }
-private:
-    T* p;
-};
-
-#endif
 
 // similiar to boost::totally_ordered
 // only need < and == operators and this fills in the rest
@@ -226,26 +147,26 @@ class mutex : noncopyable
 public:
     mutex()
     {
-        m = CreateMutex( NULL, FALSE, NULL );
+         InitializeCriticalSection(&cs);
     }
 
     ~mutex()
     {
-        CloseHandle( m );
+        DeleteCriticalSection(&cs);
     }
 
     void lock()
     {
-        WaitForSingleObject( m, INFINITE );
+        EnterCriticalSection(&cs);
     }
 
     void unlock()
     {
-        ReleaseMutex( m );
+        LeaveCriticalSection(&cs);
     }
 
 private:
-    HANDLE m;
+    CRITICAL_SECTION cs;
 };
 
 #else

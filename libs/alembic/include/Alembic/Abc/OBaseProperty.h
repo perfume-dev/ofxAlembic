@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_Abc_OBaseProperty_h_
-#define _Alembic_Abc_OBaseProperty_h_
+#ifndef Alembic_Abc_OBaseProperty_h
+#define Alembic_Abc_OBaseProperty_h
 
 #include <Alembic/Abc/Foundation.h>
 #include <Alembic/Abc/Base.h>
@@ -80,10 +80,6 @@ protected:
         //! The pointer
         //! ...
         PROP_PTR iPtr,
-
-        //! The flag indicating that the intention
-        //! is to wrap the existing pointer.
-        WrapExistingFlag /* iWrapFlag */,
 
         //! The error handling.
         //! ...
@@ -196,7 +192,6 @@ template <class PROP_PTR>
 inline OBasePropertyT<PROP_PTR>::OBasePropertyT
 (
     PROP_PTR iPtr,
-    WrapExistingFlag /* iFlag */,
     ErrorHandler::Policy iPolicy )
   : m_property( iPtr )
 {
@@ -232,7 +227,6 @@ OObject OBasePropertyT<PROP_PTR>::getObject() const
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "OBaseProperty::getObject()" );
 
     return OObject( m_property->getObject(),
-                    kWrapExisting,
                     getErrorHandlerPolicy() );
 
     ALEMBIC_ABC_SAFE_CALL_END();

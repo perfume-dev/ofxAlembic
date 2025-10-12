@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_Abc_IBaseProperty_h_
-#define _Alembic_Abc_IBaseProperty_h_
+#ifndef Alembic_Abc_IBaseProperty_h
+#define Alembic_Abc_IBaseProperty_h
 
 #include <Alembic/Abc/Foundation.h>
 #include <Alembic/Abc/Base.h>
@@ -78,11 +78,6 @@ protected:
         //! The pointer
         //! ...
         PROP_PTR iPtr,
-
-        //! The flag indicating that wrapping is intended.
-        //! Even though it's nonambiguous here, we use it anyway
-        //! for readability
-        WrapExistingFlag iWrapFlag,
 
         //! Optional error handling policy
         //! ...
@@ -149,9 +144,6 @@ public:
     //! wrapped in an IObject wrapper.
     IObject getObject() const;
 
-    //! Can't wrap
-    //! OCompoundProperty getParent();
-
     //-*************************************************************************
     // ABC BASE MECHANISMS
     // These functions are used by Abc to deal with errors, rewrapping,
@@ -189,7 +181,6 @@ template <class PROP_PTR>
 inline IBasePropertyT<PROP_PTR>::IBasePropertyT
 (
     PROP_PTR iPtr,
-    WrapExistingFlag,
     ErrorHandler::Policy iPolicy )
   : m_property( iPtr )
 {
@@ -218,7 +209,6 @@ IObject IBasePropertyT<PROP_PTR>::getObject() const
     ALEMBIC_ABC_SAFE_CALL_BEGIN( "IBasePropertyT::getObject()" );
 
     return IObject( m_property->getObject(),
-                    kWrapExisting,
                     getErrorHandlerPolicy() );
 
     ALEMBIC_ABC_SAFE_CALL_END();

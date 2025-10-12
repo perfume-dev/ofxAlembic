@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcGeom_ICamera_h_
-#define _Alembic_AbcGeom_ICamera_h_
+#ifndef Alembic_AbcGeom_ICamera_h
+#define Alembic_AbcGeom_ICamera_h
 
 #include <Alembic/Util/Export.h>
 #include <Alembic/AbcGeom/Foundation.h>
@@ -65,15 +65,13 @@ public:
     //! ...
     ICameraSchema() {}
 
-    //! This templated, primary constructor creates a new camera writer.
-    //! The first argument is any Abc (or AbcCoreAbstract) object
-    //! which can intrusively be converted to an CompoundPropertyWriterPtr
-    //! to use as a parent, from which the error handler policy for
-    //! inheritance is also derived.  The remaining optional arguments
-    //! can be used to override the ErrorHandlerPolicy, to specify
-    //! MetaData, and to set TimeSampling.
-    template <class CPROP_PTR>
-    ICameraSchema( CPROP_PTR iParent,
+    //! This constructor creates a new camera reader.
+    //! The first argument is the parent ICompoundProperty, from which the
+    //! error handler policy for is derived.  The second argument is the name
+    //! of the ICompoundProperty that contains this schemas properties.  The
+    //! remaining optional arguments can be used to override the
+    //! ErrorHandlerPolicy and to specify schema interpretation matching.
+    ICameraSchema( const ICompoundProperty & iParent,
                    const std::string &iName,
 
                    const Abc::Argument &iArg0 = Abc::Argument(),
@@ -83,24 +81,19 @@ public:
         init( iArg0, iArg1 );
     }
 
-    template <class CPROP_PTR>
-    explicit ICameraSchema( CPROP_PTR iParent,
-                            const Abc::Argument &iArg0 = Abc::Argument(),
-                            const Abc::Argument &iArg1 = Abc::Argument() )
-      : Abc::ISchema<CameraSchemaInfo>( iParent, iArg0, iArg1 )
+    //! This constructor wraps an existing ICompoundProperty as the camera
+    //! reader, and the error handler policy is derived from it.
+    //! The  remaining optional arguments can be used to override the
+    //! ErrorHandlerPolicy and to specify schema interpretation matching.
+    ICameraSchema( const ICompoundProperty & iProp,
+                   const Abc::Argument &iArg0 = Abc::Argument(),
+                   const Abc::Argument &iArg1 = Abc::Argument() )
+      : Abc::ISchema<CameraSchemaInfo>( iProp, iArg0, iArg1 )
     {
         init( iArg0, iArg1 );
     }
 
-
-    //! Copy constructor.
-    ICameraSchema(const ICameraSchema& iCopy)
-        : Abc::ISchema<CameraSchemaInfo>()
-    {
-        *this = iCopy;
-    }
-
-    //! Default assignment operator used.
+    //! Default assignment and copy operator used.
 
     //! Return the time sampling.
     AbcA::TimeSamplingPtr getTimeSampling() const

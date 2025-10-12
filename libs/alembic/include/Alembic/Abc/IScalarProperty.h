@@ -33,8 +33,8 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 //-*****************************************************************************
-#ifndef _Alembic_Abc_IScalarProperty_h_
-#define _Alembic_Abc_IScalarProperty_h_
+#ifndef Alembic_Abc_IScalarProperty_h
+#define Alembic_Abc_IScalarProperty_h
 
 #include <Alembic/Util/Export.h>
 #include <Alembic/Abc/Foundation.h>
@@ -65,14 +65,11 @@ public:
     //! ...
     IScalarProperty() : IBasePropertyT<AbcA::ScalarPropertyReaderPtr>() {}
 
-    //! This templated, explicit function creates a new scalar property reader.
-    //! The first argument is any Abc (or AbcCoreAbstract) object
-    //! which can intrusively be converted to a CompoundPropertyReaderPtr
-    //! to use as a parent, from which the error handler policy for
-    //! inheritance is also derived.  The remaining optional arguments
-    //! can be used to override the ErrorHandlerPolicy, and that's it.
-    template <class OBJECT_PTR>
-    IScalarProperty( OBJECT_PTR iParentObject,
+    //! This constructor creates a new scalar property reader.
+    //! The first argument is the parent ICompundProperty, from which the error
+    //! handler policy for inheritance is also derived.  The remaining optional
+    //! arguments can be used to override the ErrorHandlerPolicy, and that's it.
+    IScalarProperty( const ICompoundProperty & iParent,
                      const std::string &iName,
 
                      const Argument &iArg0 = Argument() );
@@ -84,15 +81,19 @@ public:
         //! ...
         AbcA::ScalarPropertyReaderPtr iPtr,
 
-        //! The flag indicating that wrapping is intended.
-        //! Even though it's nonambiguous here, we use it anyway
-        //! for readability
-        WrapExistingFlag iWrapFlag,
-
         //! Optional error handling policy
         //! ...
         const Argument &iArg0 = Argument() )
-      : IBasePropertyT<AbcA::ScalarPropertyReaderPtr>( iPtr, iWrapFlag,
+      : IBasePropertyT<AbcA::ScalarPropertyReaderPtr>( iPtr,
+            GetErrorHandlerPolicy( iPtr, iArg0 ) )
+    {}
+
+    // Deprecated in favor of the constructor above
+    IScalarProperty(
+        AbcA::ScalarPropertyReaderPtr iPtr,
+        WrapExistingFlag iWrapFlag,
+        const Argument &iArg0 = Argument() )
+      : IBasePropertyT<AbcA::ScalarPropertyReaderPtr>( iPtr,
             GetErrorHandlerPolicy( iPtr, iArg0 ) )
     {}
 
@@ -138,20 +139,6 @@ private:
 
                const Argument &iArg0 );
 };
-
-//-*****************************************************************************
-// TEMPLATE AND INLINE FUNCTIONS
-//-*****************************************************************************
-
-//-*****************************************************************************
-template <class CPROP_PTR>
-inline IScalarProperty::IScalarProperty( CPROP_PTR iParentProp,
-                                         const std::string &iName,
-                                         const Argument &iArg0 )
-{
-    init( GetCompoundPropertyReaderPtr( iParentProp ), iName,
-          GetErrorHandlerPolicy( iParentProp ), iArg0 );
-}
 
 } // End namespace ALEMBIC_VERSION_NS
 

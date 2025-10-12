@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_Util_PlainOldDataType_h_
-#define _Alembic_Util_PlainOldDataType_h_
+#ifndef Alembic_Util_PlainOldDataType_h
+#define Alembic_Util_PlainOldDataType_h
 
 #include <Alembic/Util/Foundation.h>
 #include <Alembic/Util/Exception.h>
@@ -52,7 +52,7 @@ namespace ALEMBIC_VERSION_NS {
 //-*****************************************************************************
 //! Bytes are unsigned chars, by definition.
 //! We use bytes in Alembic as the name of anonymous storage memory, since
-//! it is not possible to create arrays of voids. 
+//! it is not possible to create arrays of voids.
 typedef unsigned char           byte_t;
 
 //-*****************************************************************************
@@ -65,17 +65,17 @@ class bool_t
 {
 public:
     bool_t() : m_byte( 0 ) {}
-    
+
     bool_t( bool tf ) : m_byte( static_cast<byte_t>( tf ) ) {}
     bool_t( byte_t b ) : m_byte( b ) {}
 
-    
+
     //! Using default copy constructor
     //! ...
-    
+
     //! Using default assignment operator
     //! ...
-    
+
     bool_t& operator=( bool tf )
     {
         m_byte = static_cast<byte_t>( tf );
@@ -136,7 +136,7 @@ inline bool operator!=( bool a, const bool_t &b )
     return a != b.asBool();
 }
 
-#if !defined(_MSC_VER)
+#if !defined(_MSC_VER) || _MSC_VER >= 1600
 using ::uint8_t;
 using ::int8_t;
 using ::uint16_t;
@@ -247,7 +247,7 @@ struct PODTraits< PENUM , PTYPE >                                             \
     static size_t                       numBytes()                            \
     { return sizeof( PTYPE ) ; }                                              \
 };                                                                            \
-typedef PODTraits< PENUM , PTYPE > PTDEF 
+typedef PODTraits< PENUM , PTYPE > PTDEF
 
 //-*****************************************************************************
 // Actual specialized traits
@@ -260,9 +260,9 @@ DECLARE_TRAITS( kUint32POD,  uint32_t,  "uint32_t",  0,     Uint32PODTraits );
 DECLARE_TRAITS( kInt32POD,   int32_t,   "int32_t",   0,     Int32PODTraits );
 DECLARE_TRAITS( kUint64POD,  uint64_t,  "uint64_t",  0,     Uint64PODTraits );
 DECLARE_TRAITS( kInt64POD,   int64_t,   "int64_t",   0,     Int64PODTraits );
-DECLARE_TRAITS( kFloat16POD, float16_t, "float16_t", 0,     Float16PODTraits );
-DECLARE_TRAITS( kFloat32POD, float32_t, "float32_t", 0,     Float32PODTraits );
-DECLARE_TRAITS( kFloat64POD, float64_t, "float64_t", 0,     Float64PODTraits );
+DECLARE_TRAITS( kFloat16POD, float16_t, "float16_t", 0.0f,  Float16PODTraits );
+DECLARE_TRAITS( kFloat32POD, float32_t, "float32_t", 0.0f,  Float32PODTraits );
+DECLARE_TRAITS( kFloat64POD, float64_t, "float64_t", 0.0,   Float64PODTraits );
 DECLARE_TRAITS( kStringPOD,  string,    "string",    "",    StringPODTraits );
 DECLARE_TRAITS( kWstringPOD, wstring,   "wstring",   L"",   WstringPODTraits );
 

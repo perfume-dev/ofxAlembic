@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcMaterial_OMaterial_h_
-#define _Alembic_AbcMaterial_OMaterial_h_
+#ifndef Alembic_AbcMaterial_OMaterial_h
+#define Alembic_AbcMaterial_OMaterial_h
 
 #include <Alembic/Abc/All.h>
 
@@ -50,7 +50,7 @@ namespace ALEMBIC_VERSION_NS {
 //! a compound property.
 //! Only "monolithic" shader definitions (i.e. non network) are presently
 //! supported in this implementation.
-class ALEMBIC_EXPORT OMaterialSchema 
+class ALEMBIC_EXPORT OMaterialSchema
     : public Abc::OSchema<MaterialSchemaInfo>
 {
 public:
@@ -62,33 +62,19 @@ public:
 
     OMaterialSchema() {}
 
-    template <class CPROP_PTR>
-    OMaterialSchema( CPROP_PTR iParent,
+    OMaterialSchema(
+        Alembic::AbcCoreAbstract::CompoundPropertyWriterPtr iParent,
+        const std::string &iName,
+        const Abc::Argument &iArg0 = Abc::Argument(),
+        const Abc::Argument &iArg1 = Abc::Argument(),
+        const Abc::Argument &iArg2 = Abc::Argument(),
+        const Abc::Argument &iArg3 = Abc::Argument() );
+
+    OMaterialSchema( Abc::OCompoundProperty iParent,
                      const std::string &iName,
                      const Abc::Argument &iArg0 = Abc::Argument(),
                      const Abc::Argument &iArg1 = Abc::Argument(),
-                     const Abc::Argument &iArg2 = Abc::Argument() )
-    : Abc::OSchema<MaterialSchemaInfo>( iParent, iName, iArg0, iArg1, iArg2 )
-    {
-        init();
-    }
-
-    template <class CPROP_PTR>
-    explicit OMaterialSchema( CPROP_PTR iParent,
-                              const Abc::Argument &iArg0 = Abc::Argument(),
-                              const Abc::Argument &iArg1 = Abc::Argument(),
-                              const Abc::Argument &iArg2 = Abc::Argument() )
-    : Abc::OSchema<MaterialSchemaInfo>( iParent, iArg0, iArg1, iArg2 )
-    {
-        init();
-    }
-
-    //! Copy constructor.
-    OMaterialSchema( const OMaterialSchema& iCopy )
-    : Abc::OSchema<MaterialSchemaInfo>()
-    {
-        *this = iCopy;
-    }
+                     const Abc::Argument &iArg2 = Abc::Argument() );
 
     //-------------------------------------------------------------------------
     //ACTUAL STUFF
@@ -104,7 +90,7 @@ public:
     void setShader( const std::string & iTarget,
                     const std::string & iShaderType,
                     const std::string & iShaderName );
-    
+
     //! Declare and retrieve a container for storing properties representing
     //! parameters for the target and shaderType. You put them in there
     //! yourself since there are no restrictions on type or sampling other
@@ -113,8 +99,8 @@ public:
     Abc::OCompoundProperty getShaderParameters(
         const std::string & iTarget, const std::string & iShaderType );
 
-    //add node by name, target, type, set node connection?, set node 
-    //terminals? 
+    //add node by name, target, type, set node connection?, set node
+    //terminals?
 
     void addNetworkNode( const std::string & iNodeName,
                          const std::string & iTarget,

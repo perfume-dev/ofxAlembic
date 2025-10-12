@@ -34,8 +34,8 @@
 //
 //-*****************************************************************************
 
-#ifndef _Alembic_AbcGeom_OXform_h_
-#define _Alembic_AbcGeom_OXform_h_
+#ifndef Alembic_AbcGeom_OXform_h
+#define Alembic_AbcGeom_OXform_h
 
 #include <Alembic/Util/Export.h>
 #include <Alembic/AbcGeom/Foundation.h>
@@ -49,7 +49,7 @@ namespace ALEMBIC_VERSION_NS {
 
 //! The default value for determining whether a property is actually
 //! different from the default.
-static ALEMBIC_EXPORT_CONST double kXFORM_DELTA_TOLERANCE = 1.0e-12;
+static const double kXFORM_DELTA_TOLERANCE = 1.0e-12;
 
 //-*****************************************************************************
 class ALEMBIC_EXPORT OXformSchema : public Abc::OSchema<XformSchemaInfo>
@@ -71,74 +71,40 @@ public:
 
     //! The default constructor creates an empty OPolyMeshSchema
     //! ...
-    OXformSchema() {}
+    OXformSchema()
+    {
+        m_numChannels = 0;
+        m_numOps = 0;
+        m_useArrayProp = false;
+        m_isIdentity = true;
+    }
 
-    //! This templated, primary constructor creates a new xform writer.
-    //! The first argument is any Abc (or AbcCoreAbstract) object
-    //! which can intrusively be converted to an CompoundPropertyWriterPtr
-    //! to use as a parent, from which the error handler policy for
-    //! inheritance is also derived.  The remaining optional arguments
+    //! This constructor creates a new xform writer.
+    //! The first argument is an CompoundPropertyWriterPtr to use as a parent.
+    //! The next is the name to give the schema which is usually the default
+    //! name given by OFaceSet (.xform)  The remaining optional arguments
     //! can be used to override the ErrorHandlerPolicy, to specify
-    //! MetaData, and to set TimeSampling.
-    template <class CPROP_PTR>
-    OXformSchema( CPROP_PTR iParent,
+    //! MetaData, specify sparse sampling and to set TimeSampling.
+    OXformSchema( AbcA::CompoundPropertyWriterPtr iParent,
                   const std::string &iName,
                   const Abc::Argument &iArg0 = Abc::Argument(),
                   const Abc::Argument &iArg1 = Abc::Argument(),
-                  const Abc::Argument &iArg2 = Abc::Argument() )
-      : Abc::OSchema<XformSchemaInfo>( iParent, iName,
-                                       iArg0, iArg1, iArg2 )
-    {
-        // Meta data and error handling are eaten up by
-        // the super type, so all that's left is time sampling.
-        AbcA::TimeSamplingPtr tsPtr =
-            Abc::GetTimeSampling( iArg0, iArg1, iArg2 );
+                  const Abc::Argument &iArg2 = Abc::Argument(),
+                  const Abc::Argument &iArg3 = Abc::Argument() );
 
-        AbcA::index_t tsIndex =
-            Abc::GetTimeSamplingIndex( iArg0, iArg1, iArg2 );
+    //! This constructor creates a new xform writer.
+    //! The first argument is an OCompundProperty to use as a parent, and from
+    //! which the ErrorHandlerPolicy is derived.  The next is the name to give
+    //! the schema which is usually the default name given by OXform (.xform)
+    //! The remaining optional arguments can be used to specify MetaData,
+    //! specify sparse sampling and to set TimeSampling.
+    OXformSchema( Abc::OCompoundProperty iParent,
+                  const std::string &iName,
+                  const Abc::Argument &iArg0 = Abc::Argument(),
+                  const Abc::Argument &iArg1 = Abc::Argument(),
+                  const Abc::Argument &iArg2 = Abc::Argument() );
 
-        if ( tsPtr )
-        {
-            tsIndex = GetCompoundPropertyWriterPtr( iParent )->getObject(
-                        )->getArchive()->addTimeSampling( *tsPtr );
-        }
-
-        init( tsIndex );
-    }
-
-    //! This constructor does the same as the above, but uses the default
-    //! name from the XformSchemaInfo struct.
-    template <class CPROP_PTR>
-    explicit OXformSchema( CPROP_PTR iParent,
-                           const Abc::Argument &iArg0 = Abc::Argument(),
-                           const Abc::Argument &iArg1 = Abc::Argument(),
-                           const Abc::Argument &iArg2 = Abc::Argument() )
-      : Abc::OSchema<XformSchemaInfo>( iParent,
-                                       iArg0, iArg1, iArg2 )
-    {
-        // Meta data and error handling are eaten up by
-        // the super type, so all that's left is time sampling.
-        AbcA::TimeSamplingPtr tsPtr =
-            Abc::GetTimeSampling( iArg0, iArg1, iArg2 );
-
-        AbcA::index_t tsIndex =
-            Abc::GetTimeSamplingIndex( iArg0, iArg1, iArg2 );
-
-        if ( tsPtr )
-        {
-            tsIndex = GetCompoundPropertyWriterPtr( iParent )->getObject(
-                    )->getArchive()->addTimeSampling( *tsPtr );
-        }
-
-        init( tsIndex );
-    }
-
-    //! Explicit copy constructor to work around MSVC bug
-    OXformSchema( const OXformSchema &iCopy )
-        : Abc::OSchema<XformSchemaInfo>()
-    { *this = iCopy; }
-
-    //! Default assignment operator used.
+    //! Default assignment and copy operator used.
 
     //-*************************************************************************
     // SCHEMA STUFF
@@ -188,13 +154,16 @@ public:
         m_arbGeomParams.reset();
         m_userProperties.reset();
 
+        m_useArrayProp = false;
+        m_isIdentity = true;
+
         super_type::reset();
     }
 
     //! Valid returns whether this function set is valid.
     bool valid() const
     {
-        return ( m_opsPWPtr && super_type::valid() );
+        return ( super_type::valid() );
     }
 
     //! unspecified-bool-type operator overload.
@@ -211,7 +180,7 @@ private:
 
     // should we store are channel values in an ArrayProperty,
     // or in a ScalarProperty with some Dimension > 0 and < MAX_SCALAR_CHANS
-    bool m_useArrayProp;
+    bool m_useArrayProp{false};
 
     AbcA::DataType m_arrayValuesDataType;
     Alembic::Util::Dimensions m_arraySampleDimensions;
@@ -234,7 +203,7 @@ protected:
     // calls to set; see usage in OXformSchema::set()
     XformSample m_protoSample;
 
-    bool m_isIdentity;
+    bool m_isIdentity{true};
 
     Abc::OCompoundProperty m_arbGeomParams;
 
