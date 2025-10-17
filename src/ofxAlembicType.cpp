@@ -564,6 +564,7 @@ void Camera::updateSample(const ofCamera &camera)
 				((double) ofGetViewportHeight()) / ofGetViewportWidth() :
 				((double) height) / width;
 	const double horizontalAperture = 3.6; // Sensor size in cm
+	const double verticalAperture = horizontalAperture * aspect;
 	
 	sample.setHorizontalAperture(horizontalAperture);
 	sample.setVerticalAperture(horizontalAperture * aspect);
@@ -572,6 +573,12 @@ void Camera::updateSample(const ofCamera &camera)
 	double focalCm = sample.getVerticalAperture() * 0.5 / tan(ofDegToRad(fovDeg) * 0.5);
 	double focalMm = focalCm * 10.0;
 	
+    double verticalFilmOffset = verticalAperture * camera.getLensOffset().y * 0.5;
+	double horizontalFilmOffset = horizontalAperture * camera.getLensOffset().x * 0.5;
+
+	sample.setVerticalFilmOffset(verticalFilmOffset);
+	sample.setHorizontalFilmOffset(horizontalFilmOffset);
+
 	sample.setFocalLength(focalMm);
 }
 
@@ -596,6 +603,13 @@ void Camera::updateParams(ofCamera &camera, ofMatrix4x4 xform)
 	camera.setGlobalOrientation(xform.getRotate());
 
 	// TODO: lens offset
+	auto horizontalAperture = sample.getHorizontalAperture();
+	auto verticalAperture = sample.getVerticalAperture();
+	auto horizontalFilmOffset = sample.getHorizontalFilmOffset();
+	auto verticalFilmOffset = sample.getVerticalFilmOffset();
+	auto hoffset = 2.0 * horizontalFilmOffset / horizontalAperture;
+	auto voffset = 2.0 * verticalFilmOffset / verticalAperture;
+	camera.setLensOffset(glm::vec2(hoffset, voffset));
 }
 
 void Camera::draw()
