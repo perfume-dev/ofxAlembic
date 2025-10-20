@@ -1,4 +1,5 @@
-#include "ofxAlembicType.h"
+﻿#include "ofxAlembicType.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 using namespace ofxAlembic;
 using namespace Alembic::AbcGeom;
@@ -599,10 +600,18 @@ void Camera::updateParams(ofCamera &camera, ofMatrix4x4 xform)
 	float fovH = sample.getFieldOfView();
 	float fovV = ofRadToDeg(2 * atanf(tanf(ofDegToRad(fovH) / 2) * (h / w)));
 	camera.setFov(fovV);
-	camera.setGlobalPosition(xform.getTranslation());
-	camera.setGlobalOrientation(xform.getRotate());
 
-	// TODO: lens offset
+	glm::vec3 scale;
+	glm::quat rotation;
+	glm::vec3 translation;
+	glm::vec3 skew;
+	glm::vec4 perspective;
+	glm::mat4 glmMat = xform;
+	glm::decompose(glmMat, scale, rotation, translation, skew, perspective);
+	camera.setGlobalPosition(translation);
+	camera.setGlobalOrientation(rotation);
+
+	// lens offset
 	auto horizontalAperture = sample.getHorizontalAperture();
 	auto verticalAperture = sample.getVerticalAperture();
 	auto horizontalFilmOffset = sample.getHorizontalFilmOffset();
