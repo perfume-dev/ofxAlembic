@@ -20,10 +20,10 @@ The installed Alembic `Foundation.h` includes an explicit POSIX pthread declarat
 ## SHA-256
 
 ```text
-a517881bc1999456f5559ebd09021d7be0376b94815b5af4320ec021eccc08f9  libs/alembic/lib/osx/libAlembic.a
-e726b2a90ec0be857d43f69340c5f0a695ece2afbe51126b92aca77977ab2907  libs/alembic/lib/osx/libImath-3_2.a
+2e848d4bf77743968972cc8ec0de7abc0eb022934a5f25ddefed2ecee55cf44a  libs/alembic/lib/osx/libAlembic.a
+769f240b3e2be027e0ea37c0e2f0b53648420fb041544a9ce73451434bd141bb  libs/alembic/lib/osx/libImath-3_2.a
 edf21e7cbdd8fd632e34a5f78d55bc279cfd16239a023ad5d5b5ed3fbdc955cc  libs/alembic/lib/vs/x64/Release/Alembic.lib
-4715bfdc7d75c855944849402abd002c42dc50985526127c3624f19d3728bd71  libs/alembic/lib/vs/x64/Release/Alembic.dll
-46aa77fc00d5c5c6f72177074ca6e0ab3df12ce26320e3b986d6a8a4275dc697  libs/alembic/lib/vs/x64/Release/Imath-3_2.lib
-a71ebac1b89d190bb7187762cd3a61fcc477a87d3682968e4ffb2ea2a3e08ef6  libs/alembic/lib/vs/x64/Release/Imath-3_2.dll
+ebf75fb1e8c5e71537ae0a349c900b1687c89c3b157817415ed2da7288b5a9d6  libs/alembic/lib/vs/x64/Release/Alembic.dll
+cd75309f2c217ca2aa7a236b3070b80b009780e54a3b238e0e81a1c224f4aa05  libs/alembic/lib/vs/x64/Release/Imath-3_2.lib
+e20d0e2556b44d9865295dc15c4c2ee36b8af12e3ca10cc686c64b3a61d60c76  libs/alembic/lib/vs/x64/Release/Imath-3_2.dll
 ```

@@ -2,11 +2,6 @@ name: Build vendored dependencies
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - codex/harden-modernize
-    paths:
-      - .github/workflows/build-vendored-dependencies.yml
 
 permissions:
   contents: read
@@ -22,14 +17,14 @@ jobs:
 
     steps:
       - name: Checkout Imath
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: AcademySoftwareFoundation/Imath
           ref: v${{ env.IMATH_VERSION }}
           path: source/Imath
 
       - name: Checkout Alembic
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: alembic/alembic
           ref: ${{ env.ALEMBIC_VERSION }}
@@ -80,7 +75,7 @@ jobs:
           Get-ChildItem artifact -Recurse | Select-Object FullName, Length
 
       - name: Upload Windows dependencies
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ofxAlembic-dependencies-windows-x64
           path: artifact
@@ -92,14 +87,14 @@ jobs:
 
     steps:
       - name: Checkout Imath
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: AcademySoftwareFoundation/Imath
           ref: v${{ env.IMATH_VERSION }}
           path: source/Imath
 
       - name: Checkout Alembic
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: alembic/alembic
           ref: ${{ env.ALEMBIC_VERSION }}
@@ -147,7 +142,7 @@ jobs:
           lipo -info artifact/lib/osx/libImath-3_2.a
 
       - name: Upload macOS dependencies
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ofxAlembic-dependencies-macos-universal
           path: artifact
