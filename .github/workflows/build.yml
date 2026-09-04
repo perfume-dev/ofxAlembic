@@ -1,0 +1,142 @@
+name: Build examples
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  OF_VERSION: 0.12.1
+
+jobs:
+  macos:
+    name: macOS / Xcode
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout addon
+        uses: actions/checkout@v6
+        with:
+          path: addon
+
+      - name: Restore openFrameworks
+        id: cache-of
+        uses: actions/cache@v5
+        with:
+          path: of_root
+          key: openframeworks-${{ env.OF_VERSION }}-macos
+
+      - name: Download openFrameworks
+        if: steps.cache-of.outputs.cache-hit != 'true'
+        run: |
+          archive="of_v${OF_VERSION}_osx_release.tar.gz"
+          curl --fail --location --retry 3 \
+            "https://github.com/openframeworks/openFrameworks/releases/download/${OF_VERSION}/${archive}" \
+            --output "$archive"
+          tar -xzf "$archive"
+          mv "of_v${OF_VERSION}_osx_release" of_root
+
+      - name: Install addon
+        run: |
+          rm -rf of_root/addons/ofxAlembic
+          mv addon of_root/addons/ofxAlembic
+
+      - name: Verify bundled libraries
+        run: |
+          lipo -info of_root/addons/ofxAlembic/libs/alembic/lib/osx/libAlembic.a
+          lipo -info of_root/addons/ofxAlembic/libs/alembic/lib/osx/libImath-3_2.a
+
+      - name: Generate and build examples
+        run: |
+          of_root_path="$GITHUB_WORKSPACE/of_root"
+          addon_path="$of_root_path/addons/ofxAlembic"
+          generator="$of_root_path/projectGenerator/projectGenerator.app/Contents/Resources/app/app/projectGenerator"
+
+          for example in example-read example-write example-shader; do
+            example_path="$addon_path/$example"
+            "$generator" -o"$of_root_path" -p"osx" -a"ofxAlembic" "$example_path"
+            xcodebuild \
+              -project "$example_path/$example.xcodeproj" \
+              -scheme "$example Release" \
+              -configuration Release \
+              CODE_SIGNING_ALLOWED=NO \
+              build
+          done
+
+  windows:
+    name: Windows / Visual Studio 2022
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout addon
+        uses: actions/checkout@v6
+        with:
+          path: addon
+
+      - name: Configure MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore openFrameworks
+        id: cache-of
+        uses: actions/cache@v5
+        with:
+          path: of_root
+          key: openframeworks-${{ env.OF_VERSION }}-windows-vs64
+
+      - name: Download openFrameworks
+        if: steps.cache-of.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          $archive = "of_v${env:OF_VERSION}_vs_64_release.zip"
+          $url = "https://github.com/openframeworks/openFrameworks/releases/download/${env:OF_VERSION}/$archive"
+          curl.exe --fail --location --retry 3 $url --output $archive
+          Expand-Archive -Path $archive -DestinationPath .
+          Move-Item "of_v${env:OF_VERSION}_vs_64_release" of_root
+
+      - name: Install addon
+        shell: pwsh
+        run: |
+          $destination = "of_root/addons/ofxAlembic"
+          if (Test-Path $destination) {
+            Remove-Item -Recurse -Force $destination
+          }
+          Move-Item addon $destination
+
+      - name: Generate and build examples
+        shell: pwsh
+        run: |
+          $ofRoot = (Resolve-Path "of_root").Path
+          $addonPath = Join-Path $ofRoot "addons/ofxAlembic"
+          $generator = Join-Path $ofRoot "projectGenerator/resources/app/app/projectGenerator.exe"
+
+          foreach ($example in @("example-read", "example-write", "example-shader")) {
+            $examplePath = Join-Path $addonPath $example
+            & $generator --ofPath="$ofRoot" --platforms="vs" --addons="ofxAlembic" $examplePath
+            if ($LASTEXITCODE -ne 0) {
+              throw "Project Generator failed for $example"
+            }
+
+            $solution = Join-Path $examplePath "$example.sln"
+            msbuild $solution /m /p:Configuration=Release /p:Platform=x64
+            if ($LASTEXITCODE -ne 0) {
+              throw "MSBuild failed for $example"
+            }
+
+            if (-not (Test-Path (Join-Path $examplePath "bin/Alembic.dll"))) {
+              throw "Alembic.dll was not copied for $example"
+            }
+            if (-not (Test-Path (Join-Path $examplePath "bin/Imath-3_2.dll"))) {
+              throw "Imath-3_2.dll was not copied for $example"
+            }
+          }

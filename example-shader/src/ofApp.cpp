@@ -16,7 +16,11 @@ void ofApp::setup()
 	
 	string path = "alembic_test_ogawa.abc";
 	
-	abc.open(path);
+	if (!abc.open(path))
+	{
+		ofLogError("example-shader") << "Could not open " << path;
+		return;
+	}
 	
 	shader.load("shader.vert", "shader.frag");
 }
@@ -24,6 +28,9 @@ void ofApp::setup()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	if (!abc.isOpen() || abc.getMaxTime() <= 0)
+		return;
+
 	float t = fmodf(ofGetElapsedTimef(), abc.getMaxTime());
 	abc.setTime(t);
 }

@@ -1,0 +1,149 @@
+name: Build vendored dependencies
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ALEMBIC_VERSION: 1.8.12
+  IMATH_VERSION: 3.2.3
+
+jobs:
+  windows:
+    name: Windows x64
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout Imath
+        uses: actions/checkout@v6
+        with:
+          repository: AcademySoftwareFoundation/Imath
+          ref: v${{ env.IMATH_VERSION }}
+          path: source/Imath
+
+      - name: Checkout Alembic
+        uses: actions/checkout@v6
+        with:
+          repository: alembic/alembic
+          ref: ${{ env.ALEMBIC_VERSION }}
+          path: source/Alembic
+
+      - name: Apply addon compatibility patch
+        shell: pwsh
+        run: |
+          foreach ($path in @("source/Imath/src/Imath/half.cpp", "source/Imath/src/Imath/half.h")) {
+            $content = [System.IO.File]::ReadAllText($path)
+            $content = $content.Replace("printBits", "ofxAlembicImathPrintBits")
+            [System.IO.File]::WriteAllText($path, $content, [System.Text.UTF8Encoding]::new($false))
+          }
+
+      - name: Build and install Imath
+        shell: pwsh
+        run: |
+          cmake -S source/Imath -B build/Imath -A x64 `
+            -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE/install" `
+            -DBUILD_SHARED_LIBS=ON `
+            -DBUILD_TESTING=OFF `
+            -DIMATH_INSTALL_PKG_CONFIG=OFF
+          cmake --build build/Imath --config Release --target install --parallel
+
+      - name: Build and install Alembic
+        shell: pwsh
+        run: |
+          cmake -S source/Alembic -B build/Alembic -A x64 `
+            -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE/install" `
+            -DCMAKE_PREFIX_PATH="$env:GITHUB_WORKSPACE/install" `
+            -DALEMBIC_SHARED_LIBS=ON `
+            -DUSE_BINARIES=OFF `
+            -DUSE_HDF5=OFF `
+            -DUSE_PYALEMBIC=OFF `
+            -DUSE_TESTS=OFF
+          cmake --build build/Alembic --config Release --target install --parallel
+
+      - name: Package addon dependencies
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifact/include, artifact/lib/vs/x64/Release | Out-Null
+          Copy-Item install/include/Alembic artifact/include/Alembic -Recurse
+          Copy-Item install/include/Imath artifact/include/Imath -Recurse
+          Copy-Item install/lib/Alembic.lib artifact/lib/vs/x64/Release/Alembic.lib
+          Copy-Item install/bin/Alembic.dll artifact/lib/vs/x64/Release/Alembic.dll
+          Copy-Item install/lib/Imath-3_2.lib artifact/lib/vs/x64/Release/Imath-3_2.lib
+          Copy-Item install/bin/Imath-3_2.dll artifact/lib/vs/x64/Release/Imath-3_2.dll
+          Get-ChildItem artifact -Recurse | Select-Object FullName, Length
+
+      - name: Upload Windows dependencies
+        uses: actions/upload-artifact@v6
+        with:
+          name: ofxAlembic-dependencies-windows-x64
+          path: artifact
+          if-no-files-found: error
+
+  macos:
+    name: macOS Universal
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout Imath
+        uses: actions/checkout@v6
+        with:
+          repository: AcademySoftwareFoundation/Imath
+          ref: v${{ env.IMATH_VERSION }}
+          path: source/Imath
+
+      - name: Checkout Alembic
+        uses: actions/checkout@v6
+        with:
+          repository: alembic/alembic
+          ref: ${{ env.ALEMBIC_VERSION }}
+          path: source/Alembic
+
+      - name: Apply addon compatibility patch
+        run: |
+          perl -pi -e 's/\bprintBits\b/ofxAlembicImathPrintBits/g' \
+            source/Imath/src/Imath/half.cpp \
+            source/Imath/src/Imath/half.h
+
+      - name: Build and install Imath
+        run: |
+          cmake -S source/Imath -B build/Imath -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install" \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DBUILD_TESTING=OFF \
+            -DIMATH_INSTALL_PKG_CONFIG=OFF
+          cmake --build build/Imath --target install --parallel
+
+      - name: Build and install Alembic
+        run: |
+          cmake -S source/Alembic -B build/Alembic -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install" \
+            -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/install" \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
+            -DALEMBIC_SHARED_LIBS=OFF \
+            -DUSE_BINARIES=OFF \
+            -DUSE_HDF5=OFF \
+            -DUSE_PYALEMBIC=OFF \
+            -DUSE_TESTS=OFF
+          cmake --build build/Alembic --target install --parallel
+
+      - name: Package addon dependencies
+        run: |
+          mkdir -p artifact/include artifact/lib/osx
+          cp -R install/include/Alembic install/include/Imath artifact/include/
+          cp install/lib/libAlembic.a install/lib/libImath-3_2.a artifact/lib/osx/
+          lipo -info artifact/lib/osx/libAlembic.a
+          lipo -info artifact/lib/osx/libImath-3_2.a
+
+      - name: Upload macOS dependencies
+        uses: actions/upload-artifact@v6
+        with:
+          name: ofxAlembic-dependencies-macos-universal
+          path: artifact
+          if-no-files-found: error

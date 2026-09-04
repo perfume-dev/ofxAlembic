@@ -20,7 +20,7 @@ class IPolyMesh;
 class ICamera;
 
 template <typename T>
-inline ofxAlembic::Type type2enum() { return ofxAlembic::UNKHOWN; }
+inline ofxAlembic::Type type2enum() { return ofxAlembic::UNKNOWN; }
 
 template <>
 inline ofxAlembic::Type type2enum<ofxAlembic::XForm>() { return ofxAlembic::XFORM; }
@@ -39,7 +39,8 @@ class ofxAlembic::Reader
 {
 public:
 
-	~Reader() {}
+		Reader();
+		~Reader();
 
 	bool open(const string& path);
 	void close();
@@ -72,16 +73,24 @@ public:
 	bool get(size_t idx, vector<ofVec3f>& points);
 	bool get(size_t idx, ofCamera &camera);
 
-	inline IGeom* get(size_t idx) { return object_arr[idx]; }
-	
-	IGeom* get(const string& path)
-	{
-		if (object_name_map.find(path) != object_name_map.end())
-			return object_name_map[path];
-		if (object_fullname_map.find(path) != object_fullname_map.end())
-			return object_fullname_map[path];
+		inline bool isOpen() const { return m_archive.valid() && m_root; }
 
-		return NULL;
+		inline IGeom* get(size_t idx)
+		{
+			return idx < object_arr.size() ? object_arr[idx] : NULL;
+		}
+
+		IGeom* get(const string& path)
+		{
+			map<string, IGeom*>::iterator name_it = object_name_map.find(path);
+			if (name_it != object_name_map.end())
+				return name_it->second;
+
+			map<string, IGeom*>::iterator fullname_it = object_fullname_map.find(path);
+			if (fullname_it != object_fullname_map.end())
+				return fullname_it->second;
+
+			return NULL;
 	}
 	
 protected:

@@ -60,6 +60,10 @@
 #include <cstring>
 #include <cassert>
 
+#ifndef _MSC_VER
+#include <pthread.h>
+#endif
+
 #include <Alembic/Util/Export.h>
 
 #ifdef _MSC_VER
@@ -74,7 +78,7 @@
 #endif
 
 // needed for mutex stuff
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 // needed for std min/max

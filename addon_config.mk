@@ -18,6 +18,8 @@ meta:
 	ADDON_NAME = ofxAlembic
 	ADDON_DESCRIPTION = Alembic wrapper for openFrameworks
 	ADDON_AUTHOR = perfume-dev
+	ADDON_TAGS = "Alembic" "3D" "geometry" "animation" "cache"
+	ADDON_URL = https://github.com/perfume-dev/ofxAlembic
 
 common:
 	# dependencies with other addons, a list of them separated by spaces
@@ -66,10 +68,8 @@ vs:
 	ADDON_LIBS =
 	# Release conf
 	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Alembic.lib
-	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Imath-3_1.lib
+	ADDON_LIBS += libs/alembic/lib/vs/x64/Release/Imath-3_2.lib
 
 	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Alembic.dll"
-	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Imath-3_1.dll"
-
-
+	ADDON_DLLS_TO_COPY += "libs/alembic/lib/vs/x64/Release/Imath-3_2.dll"
 
