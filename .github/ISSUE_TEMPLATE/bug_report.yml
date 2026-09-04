@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a reproducible build, runtime, or Alembic data problem.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not use this form for security vulnerabilities. Follow SECURITY.md instead.
+  - type: input
+    id: of-version
+    attributes:
+      label: openFrameworks version
+      placeholder: 0.12.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, CPU architecture, and Xcode or Visual Studio version.
+      placeholder: macOS 15, Apple Silicon, Xcode 16
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Build or installation
+        - Reading Alembic data
+        - Writing Alembic data
+        - Drawing
+        - Example application
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include exact steps and the smallest code or shareable Alembic file needed to reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior and logs
+      render: shell
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I searched existing issues and pull requests.
+          required: true
+        - label: I removed confidential assets and personal information.
+          required: true

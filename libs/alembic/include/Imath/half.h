@@ -997,10 +997,10 @@ public:
 //----------
 
 IMATH_EXPORT void
-printBits (std::ostream& os, IMATH_INTERNAL_NAMESPACE::half h);
-IMATH_EXPORT void printBits (std::ostream& os, float f);
-IMATH_EXPORT void printBits (char c[19], IMATH_INTERNAL_NAMESPACE::half h);
-IMATH_EXPORT void printBits (char c[35], float f);
+ofxAlembicImathPrintBits (std::ostream& os, IMATH_INTERNAL_NAMESPACE::half h);
+IMATH_EXPORT void ofxAlembicImathPrintBits (std::ostream& os, float f);
+IMATH_EXPORT void ofxAlembicImathPrintBits (char c[19], IMATH_INTERNAL_NAMESPACE::half h);
+IMATH_EXPORT void ofxAlembicImathPrintBits (char c[35], float f);
 
 #if !defined(__CUDACC__) && !defined(__CUDA_FP16_HPP__) && !defined(__HIP__)
 using half = IMATH_INTERNAL_NAMESPACE::half;

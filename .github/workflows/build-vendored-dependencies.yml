@@ -35,6 +35,15 @@ jobs:
           ref: ${{ env.ALEMBIC_VERSION }}
           path: source/Alembic
 
+      - name: Apply addon compatibility patch
+        shell: pwsh
+        run: |
+          foreach ($path in @("source/Imath/src/Imath/half.cpp", "source/Imath/src/Imath/half.h")) {
+            $content = [System.IO.File]::ReadAllText($path)
+            $content = $content.Replace("printBits", "ofxAlembicImathPrintBits")
+            [System.IO.File]::WriteAllText($path, $content, [System.Text.UTF8Encoding]::new($false))
+          }
+
       - name: Build and install Imath
         shell: pwsh
         run: |
@@ -96,13 +105,19 @@ jobs:
           ref: ${{ env.ALEMBIC_VERSION }}
           path: source/Alembic
 
+      - name: Apply addon compatibility patch
+        run: |
+          perl -pi -e 's/\bprintBits\b/ofxAlembicImathPrintBits/g' \
+            source/Imath/src/Imath/half.cpp \
+            source/Imath/src/Imath/half.h
+
       - name: Build and install Imath
         run: |
           cmake -S source/Imath -B build/Imath -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install" \
             -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.5 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
             -DBUILD_SHARED_LIBS=OFF \
             -DBUILD_TESTING=OFF \
             -DIMATH_INSTALL_PKG_CONFIG=OFF
@@ -115,7 +130,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/install" \
             -DCMAKE_PREFIX_PATH="$GITHUB_WORKSPACE/install" \
             -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
-            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.5 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 \
             -DALEMBIC_SHARED_LIBS=OFF \
             -DUSE_BINARIES=OFF \
             -DUSE_HDF5=OFF \
