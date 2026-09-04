@@ -115,6 +115,18 @@ void ofxAlembic::ICamera::updateWithTimeInternal(double time, Imath::M44f& xform
 
 #pragma mark - Reader
 
+ofxAlembic::Reader::Reader()
+	: m_minTime(0)
+	, m_maxTime(0)
+	, current_time(0)
+{
+}
+
+ofxAlembic::Reader::~Reader()
+{
+	close();
+}
+
 bool ofxAlembic::Reader::open(const string& path)
 {
 	ofxAlembic::init();
@@ -125,19 +137,34 @@ bool ofxAlembic::Reader::open(const string& path)
 		return false;
 	}
 
-    {
-        m_archive = IArchive(Alembic::AbcCoreOgawa::ReadArchive(), ofToDataPath(path),
-                             Alembic::Abc::ErrorHandler::kNoisyNoopPolicy);
-        if (!m_archive.valid()) return false;
-    }
+	close();
+
+	try
+	{
+		m_archive = IArchive(Alembic::AbcCoreOgawa::ReadArchive(), ofToDataPath(path),
+		                     Alembic::Abc::ErrorHandler::kNoisyNoopPolicy);
+	}
+	catch (const std::exception& error)
+	{
+		ofLogError("ofxAlembic") << "could not open '" << path << "': " << error.what();
+		close();
+		return false;
+	}
+
+	if (!m_archive.valid())
+	{
+		close();
+		return false;
+	}
 
 	m_root = ofPtr<IGeom>(new IGeom(m_archive.getTop()));
 
 	{
 		object_arr.clear();
-		object_name_arr.clear();
-		object_fullname_arr.clear();
-		object_name_map.clear();
+			object_name_arr.clear();
+			object_fullname_arr.clear();
+			object_name_map.clear();
+			object_fullname_map.clear();
 
 		ofxAlembic::IGeom::visit_geoms(m_root, object_name_map, object_fullname_map);
 
@@ -173,12 +200,17 @@ void ofxAlembic::Reader::close()
 	object_name_arr.clear();
 	object_fullname_arr.clear();
 	object_name_map.clear();
+	object_fullname_map.clear();
 
 	if (m_root)
 		m_root.reset();
 
 	if (m_archive.valid())
 		m_archive.reset();
+
+	m_minTime = 0;
+	m_maxTime = 0;
+	current_time = 0;
 }
 
 void ofxAlembic::Reader::draw()
@@ -298,9 +330,9 @@ bool ofxAlembic::Reader::get(size_t idx, ofCamera &camera)
 
 #pragma mark - IGeom
 
-IGeom::IGeom() : m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKHOWN) {}
+IGeom::IGeom() : m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKNOWN) {}
 
-IGeom::IGeom(Alembic::AbcGeom::IObject object) : m_object(object), m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKHOWN)
+IGeom::IGeom(Alembic::AbcGeom::IObject object) : m_object(object), m_minTime(std::numeric_limits<float>::infinity()), m_maxTime(0), type(UNKNOWN)
 {
 	setupWithObject(m_object);
 }

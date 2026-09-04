@@ -24,7 +24,8 @@ enum Type
 	POLYMESH,
 	CAMERA,
 	XFORM,
-	UNKHOWN
+	UNKNOWN,
+	UNKHOWN = UNKNOWN // Backward-compatible alias for the original misspelling.
 };
 }
 
@@ -33,7 +34,7 @@ class ofxAlembic::XForm
 public:
 	Imath::M44f mat;
 	
-	XForm() {}
+	XForm() { mat.makeIdentity(); }
 	XForm(const glm::mat4& matrix);
 	
 	void draw();
@@ -103,12 +104,12 @@ class ofxAlembic::Camera
 public:
 
 	Camera() : width(0), height(0) {}
-	Camera(const ofCamera& camera) : width(0), height(0) {}
+	Camera(const ofCamera& camera) : width(0), height(0) { updateSample(camera); }
 	
 	void get(Alembic::AbcGeom::OCameraSchema &schema) const;
 	void set(Alembic::AbcGeom::ICameraSchema &schema, float time);
 	
-	void setViewport(int width, int height) { this->width = width, this->height = height; }
+	void setViewport(int width, int height) { this->width = width; this->height = height; }
 	
 	void updateParams(ofCamera &camera, ofMatrix4x4 xform);
 	void updateSample(const ofCamera &camera);

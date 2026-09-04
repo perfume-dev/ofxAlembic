@@ -99,7 +99,7 @@ void ofApp::setup()
 				// camera
 				{
 					outcam.setFov(20 + f * 0.5);
-					outcam.orbit(f, 50.0, 600.0 + 600.0 * ofNoise(f / 60.0 + 10.0));
+					outcam.orbitDeg(f, 50.0, 600.0 + 600.0 * ofNoise(f / 60.0 + 10.0));
 					outcam.begin();
 					outcam.end();
 					
@@ -110,7 +110,11 @@ void ofApp::setup()
 		}
 	}
 	
-	abc.open(path);
+	if (!abc.open(path))
+	{
+		ofLogError("example-write") << "Could not open generated file " << path;
+		return;
+	}
 	
 	abc.dumpNames();
 }
@@ -123,6 +127,9 @@ void ofApp::exit()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	if (!abc.isOpen() || abc.getMaxTime() <= 0)
+		return;
+
 	float t = fmodf(ofGetElapsedTimef(), abc.getMaxTime());
 	abc.setTime(t);
 }
@@ -166,7 +173,8 @@ void ofApp::draw()
 
 	{
 		ofSetColor(255, 255, 0);
-		abc.get("/box")->draw(); // draw box with xform
+		if (ofxAlembic::IGeom* box = abc.get("/box"))
+			box->draw(); // draw box with xform
 	}
 
 	// or simply, abc.draw();

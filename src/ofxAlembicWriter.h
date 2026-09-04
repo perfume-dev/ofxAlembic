@@ -8,6 +8,8 @@
 #include <Alembic/AbcCoreFactory/All.h>
 #include <Alembic/AbcCoreOgawa/All.h>
 
+#include <stdexcept>
+
 namespace ofxAlembic
 {
 class Writer;
@@ -17,7 +19,8 @@ class ofxAlembic::Writer
 {
 public:
 
-	~Writer() { close(); }
+		Writer();
+		~Writer() { close(); }
 
 	bool open(const string& path, float fps = 30, Alembic::AbcCoreFactory::IFactory::CoreType type = Alembic::AbcCoreFactory::IFactory::kOgawa);
 	void close();
@@ -34,7 +37,8 @@ public:
 
 	void rewind();
 
-	void flashFrame();
+		void flashFrame();
+		inline bool isOpen() const { return archive.valid(); }
 
 protected:
 
@@ -45,24 +49,34 @@ protected:
 	float current_time;
 
 	template <typename T>
-	T& getObject(const string& path)
-	{
-		using namespace Alembic::AbcGeom;
-		
+		T& getObject(const string& path)
+		{
+			using namespace Alembic::AbcGeom;
+
+			if (!archive.valid())
+			{
+				throw std::logic_error("ofxAlembic::Writer is not open");
+			}
+
 		// validation
 		if (path.empty()
 			|| path[0] != '/'
 			|| path[path.size() - 1] == '/')
-		{
-			ofLogError("ofxAlembic::Writer") << "invalid path: '" << path << "'";
-			throw;
-		}
+			{
+				ofLogError("ofxAlembic::Writer") << "invalid path: '" << path << "'";
+				throw std::invalid_argument("Alembic object paths must start with '/' and must not end with '/'");
+			}
 		
 		map<string, OObject*>::iterator it = object_map.find(path);
 		
 		// return if already created
-		if (it != object_map.end())
-			return *(T*)(it->second);
+			if (it != object_map.end())
+			{
+				T* typed_object = dynamic_cast<T*>(it->second);
+				if (typed_object == NULL)
+					throw std::logic_error("Alembic object path is already used by a different schema type: " + path);
+				return *typed_object;
+			}
 
 		vector<string> e = ofSplitString(path, "/", true, true);
 		string new_object_name = e.back();
@@ -77,10 +91,10 @@ protected:
 			
 			map<string, OObject*>::iterator parent_it = object_map.find(parent_path);
 			if (parent_it == object_map.end())
-			{
-				ofLogError("ofxAlembic::Writer") << "parent object not found: '" << path << "'";
-				throw;
-			}
+				{
+					ofLogError("ofxAlembic::Writer") << "parent object not found: '" << path << "'";
+					throw std::invalid_argument("Alembic parent object must be created before its children: " + parent_path);
+				}
 			
 			OObject* parent_object = parent_it->second;
 			

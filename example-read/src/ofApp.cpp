@@ -16,7 +16,11 @@ void ofApp::setup()
 	string path = "sample_ogawa.abc";
 	
 	// load allembic file
-	abc.open(path);
+	if (!abc.open(path))
+	{
+		ofLogError("example-read") << "Could not open " << path;
+		return;
+	}
 	
 	// show all drawable names
 	abc.dumpNames();
@@ -30,6 +34,9 @@ void ofApp::exit()
 //--------------------------------------------------------------
 void ofApp::update()
 {
+	if (!abc.isOpen() || abc.getMaxTime() <= 0)
+		return;
+
 	float t = fmodf(ofGetElapsedTimef(), abc.getMaxTime());
 	
 	// update alemblic reader with time in sec
